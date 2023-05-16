@@ -1,17 +1,31 @@
 #pragma once
-
 #include "transport_catalogue.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include <deque>
+#include <sstream>
 
-namespace transport {
+namespace transport_catalogue
+{
+    class InputReader
+    {
+    public:
+        explicit InputReader(TransportCatalogue& transport_catalogue);
 
-    void FillCatalogue(Catalogue& catalogue);
+        void ReadRequests(std::istream& input_stream);
 
-    namespace detail {
+    private:
+        TransportCatalogue& transport_catalogue_;
+        std::vector<Stop> request_stops_;
+        std::vector<std::vector<std::pair<std::string, int>>> distances_to_stops_;
+        std::vector<std::tuple<std::string, bool, std::vector<std::string>>> request_buses_;
+        //std::vector<std::pair<Bus, std::vector<std::string>>> request_buses_;
 
-        Bus FillRoute(std::string& line);
-        Stop FillStop(std::string& line);
-        void FillStopDistances(std::string& line, Catalogue& catalogue);
+        void ReadStop(std::string& request_stop);
 
-    } // namespace detail
+        void ReadBus(std::string& request_bus);
 
-} // namespace transport
+        std::vector<std::string> SplitBusStops(const std::string& str, const std::string& delimiter);
+    };
+}//namespace transport_catalogue
