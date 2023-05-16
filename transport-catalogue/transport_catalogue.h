@@ -22,7 +22,7 @@ namespace transport_catalogue
 	{
 		std::string name;
 		std::vector<std::string_view> stops;
-		bool is_roundtrip;
+		bool Is_Circling;
 	};
 
 	struct BusInfo

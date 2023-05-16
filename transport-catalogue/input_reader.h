@@ -20,7 +20,6 @@ namespace transport_catalogue
         std::vector<Stop> request_stops_;
         std::vector<std::vector<std::pair<std::string, int>>> distances_to_stops_;
         std::vector<std::tuple<std::string, bool, std::vector<std::string>>> request_buses_;
-        //std::vector<std::pair<Bus, std::vector<std::string>>> request_buses_;
 
         void ReadStop(std::string& request_stop);
 

@@ -89,7 +89,7 @@ namespace transport_catalogue
 		std::vector <std::string_view> stops_view;
 
 		bus_add.name = std::get<0>(bus_input);
-		bus_add.is_roundtrip = std::get<1>(bus_input);
+		bus_add.Is_Circling = std::get<1>(bus_input);
 		for (const std::string& stop : std::get<2>(bus_input))
 		{
 			if (stopname_to_stop_.count(stop))
@@ -141,7 +141,7 @@ namespace transport_catalogue
 			get_distance_length += GetDistance(current_stop, next_stop);
 		}
 
-		if (bus->is_roundtrip)
+		if (bus->Is_Circling)
 		{
 			bus_info.amount_stops = stops_view.size();
 		}

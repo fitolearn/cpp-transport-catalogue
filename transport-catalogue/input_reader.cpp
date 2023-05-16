@@ -63,11 +63,11 @@ namespace transport_catalogue
         request_stop.erase(0, colon_pos + 2);
 
         std::size_t comma_pos = request_stop.find(", "s);
-        stop.coordinates.lat = std::stod(request_stop.substr(0, comma_pos));
+        stop.coordinates.latitude = std::stod(request_stop.substr(0, comma_pos));
         request_stop.erase(0, comma_pos + 2);
 
         comma_pos = request_stop.find(", ");
-        stop.coordinates.lng = std::stod(request_stop.substr(0, comma_pos));
+        stop.coordinates.longitude = std::stod(request_stop.substr(0, comma_pos));
 
         while (comma_pos != std::string::npos)
         {
