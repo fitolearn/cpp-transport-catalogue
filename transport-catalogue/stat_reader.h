@@ -1,16 +1,29 @@
 #pragma once
-
 #include "transport_catalogue.h"
+#include <iostream>
+#include <set>
+#include <deque>
+#include <string>
+#include <string_view>
+#include <fstream>
 
-namespace transport {
+namespace transport_catalogue
+{
+	struct RequestData
+	{
+		std::string type;
+		std::string query;
+	};
 
-    void ProcessRequests(Catalogue& catalogue);
+	class StatReader
+	{
+	public:
+		explicit StatReader(const TransportCatalogue& transport_catalogue);
 
-    namespace detail {
+		void OutputRequests(std::istream& input_stream);
 
-        void PrintRoute(std::string& line, Catalogue& catalogue);
-        void PrintStop(std::string& line, Catalogue& catalogue);
-
-    } // namespace detail
-
-} // namespace transport
+	private:
+		const TransportCatalogue& transport_catalogue_;
+		std::vector<RequestData> requests_queue_;
+	};
+}//namespace transport_catalogue
