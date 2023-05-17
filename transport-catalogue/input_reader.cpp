@@ -43,13 +43,14 @@ namespace transport_catalogue
         int i = 0;
         for (const Stop & stop : request_stops_)
         {
-            transport_catalogue_.SetDistance(stop.name, distances_to_stops_[i]);
+            transport_catalogue_.SetDistance(stop.name,
+                                             reinterpret_cast<std::vector<DistancesToStop> &>(distances_to_stops_[i]));
             ++i;
         }
 
-        for (const auto& bus : request_buses_)
+        for (const auto& [name, is, stops] : request_buses_)
         {
-            transport_catalogue_.AddBus(bus);
+            transport_catalogue_.AddBus(name, is, stops);
         }
     }
 

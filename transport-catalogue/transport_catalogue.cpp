@@ -50,7 +50,7 @@ namespace transport_catalogue
 		return stopname_to_busnames_.at(stop);
 	}
 
-	void TransportCatalogue::SetDistance(const std::string& stop, std::vector<std::pair<std::string, int>>& distances_to_stops)
+	void TransportCatalogue::SetDistance(const std::string& stop, std::vector<DistancesToStop>& distances_to_stops)
 	{
 		if (distances_to_stops.size() == 0)
 		{
@@ -83,17 +83,15 @@ namespace transport_catalogue
 		}
 	}
 
-	void TransportCatalogue::AddBus(const std::tuple<std::string, bool, std::vector<std::string>>& bus_input)
+	void TransportCatalogue::AddBus(const std::string name , bool is_circle, std::vector<std::string> stops)
 	{
 		Bus bus_add;
 		std::vector <std::string_view> stops_view;
 
-		bus_add.name = std::get<0>(bus_input);
-		bus_add.Is_Circling = std::get<1>(bus_input);
-		for (const std::string& stop : std::get<2>(bus_input))
-		{
-			if (stopname_to_stop_.count(stop))
-			{
+		bus_add.name = name;
+		bus_add.Is_Circling = is_circle;
+		for (const std::string& stop : stops) {
+			if (stopname_to_stop_.count(stop)) {
 				stops_view.push_back(stopname_to_stop_.at(stop)->name);
 			}
 		}

@@ -1,0 +1,97 @@
+{
+	"kind" : "toolchains",
+	"toolchains" : 
+	[
+		{
+			"compiler" : 
+			{
+				"id" : "AppleClang",
+				"implicit" : 
+				{
+					"includeDirectories" : 
+					[
+						"/Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/include",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/usr/include",
+						"/Library/Developer/CommandLineTools/usr/include"
+					],
+					"linkDirectories" : 
+					[
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/usr/lib"
+					],
+					"linkFrameworkDirectories" : 
+					[
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/System/Library/Frameworks"
+					],
+					"linkLibraries" : []
+				},
+				"path" : "/usr/bin/gcc",
+				"version" : "14.0.0.14000029"
+			},
+			"language" : "C",
+			"sourceFileExtensions" : 
+			[
+				"c",
+				"m"
+			]
+		},
+		{
+			"compiler" : 
+			{
+				"id" : "GNU",
+				"implicit" : 
+				{
+					"includeDirectories" : 
+					[
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/include/c++/12",
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/include/c++/12/aarch64-apple-darwin21",
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/include/c++/12/backward",
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/lib/gcc/12/gcc/aarch64-apple-darwin21/12/include",
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/lib/gcc/12/gcc/aarch64-apple-darwin21/12/include-fixed",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/usr/include",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/System/Library/Frameworks"
+					],
+					"linkDirectories" : 
+					[
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/lib/gcc/12/gcc/aarch64-apple-darwin21/12",
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/lib/gcc/12/gcc",
+						"/opt/homebrew/Cellar/gcc@12/12.2.0/lib/gcc/12",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/usr/lib"
+					],
+					"linkFrameworkDirectories" : 
+					[
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/System/Library/Frameworks"
+					],
+					"linkLibraries" : 
+					[
+						"stdc++",
+						"emutls_w",
+						"gcc",
+						"gcc"
+					]
+				},
+				"path" : "/opt/homebrew/Cellar/gcc@12/12.2.0/bin/g++-12",
+				"version" : "12.2.0"
+			},
+			"language" : "CXX",
+			"sourceFileExtensions" : 
+			[
+				"C",
+				"M",
+				"c++",
+				"cc",
+				"cpp",
+				"cxx",
+				"mm",
+				"mpp",
+				"CPP",
+				"ixx",
+				"cppm"
+			]
+		}
+	],
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 0
+	}
+}

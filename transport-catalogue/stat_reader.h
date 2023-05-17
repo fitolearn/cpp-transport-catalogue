@@ -19,8 +19,8 @@ namespace transport_catalogue
 	{
 	public:
 		explicit StatReader(const TransportCatalogue& transport_catalogue);
-
-		void OutputRequests(std::istream& input_stream);
+        void PrintRequests(std::vector<RequestData> requests_queue_, std::ostream& output_stream) const;
+		void OutputRequests(std::istream& input_stream, std::ostream& output_stream);
 
 	private:
 		const TransportCatalogue& transport_catalogue_;

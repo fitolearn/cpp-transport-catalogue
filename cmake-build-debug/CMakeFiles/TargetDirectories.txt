@@ -1,0 +1,3 @@
+/Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug/CMakeFiles/cpp_transport_catalogue.dir
+/Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug/CMakeFiles/rebuild_cache.dir

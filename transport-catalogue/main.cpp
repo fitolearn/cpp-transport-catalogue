@@ -9,6 +9,6 @@ int main()
 	transport_catalogue::InputReader i_r(t_c);
 	i_r.ReadRequests(std::cin);
 	transport_catalogue::StatReader s_r(t_c);
-	s_r.OutputRequests(std::cin);
+	s_r.OutputRequests(std::cin, std::cerr);
 	return 0;
 }
