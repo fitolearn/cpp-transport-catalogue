@@ -45,7 +45,7 @@ namespace transport_catalogue
 	{
 		if (stopname_to_busnames_.count(stop) == 0)
 		{
-			return {};
+			return std::nullopt;
 		}
 		return stopname_to_busnames_.at(stop);
 	}
@@ -125,7 +125,7 @@ namespace transport_catalogue
 		
 		if (bus == nullptr)
 		{
-			return {};
+			return std::nullopt;
 		}
 		bus_info.name = bus_name;
 		std::vector<std::string_view> stops_view = bus->stops;
