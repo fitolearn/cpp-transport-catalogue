@@ -22,7 +22,6 @@ namespace transport_catalogue
         std::vector<std::tuple<std::string, bool, std::vector<std::string>>> request_buses_;
 
         void ReadStop(std::string& request_stop);
-
         void ReadBus(std::string& request_bus);
 
         std::vector<std::string> SplitBusStops(const std::string& str, const std::string& delimiter);

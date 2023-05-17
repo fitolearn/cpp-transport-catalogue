@@ -87,7 +87,7 @@ namespace transport_catalogue
     void InputReader::ReadBus(std::string& request_bus)
     {
         std::string bus_name;
-        bool is_roundtrip;
+        bool is_circling;
         std::vector<std::string> bus_stops;
         std::string delimiter = ": "s;
         bus_name = request_bus.substr(0, request_bus.find(delimiter));
@@ -95,15 +95,15 @@ namespace transport_catalogue
         auto roundtrip = request_bus.find(">"s);
         if (roundtrip != std::string::npos)
         {
-            is_roundtrip = true;
+            is_circling = true;
             bus_stops = SplitBusStops(request_bus, " > "s);
         }
         else
         {
-            is_roundtrip = false;
+            is_circling = false;
             bus_stops = SplitBusStops(request_bus, " - "s);
         }
-        request_buses_.push_back(std::make_tuple(bus_name, is_roundtrip, bus_stops));
+        request_buses_.push_back(std::make_tuple(bus_name, is_circling, bus_stops));
     }
 
     std::vector<std::string> InputReader::SplitBusStops(const std::string& request, const std::string& delimiter)
