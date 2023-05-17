@@ -35,9 +35,9 @@ namespace transport_catalogue
             }
         }
 
-        for (const Stop& stop : request_stops_)
+        for (auto stop : request_stops_)
         {
-            transport_catalogue_.AddStop(stop);
+            transport_catalogue_.AddStop(std::move(stop));
         }
 
         int i = 0;

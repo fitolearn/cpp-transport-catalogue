@@ -25,7 +25,7 @@ namespace transport_catalogue
 		}
 	}//namespace detail
 
-	void TransportCatalogue::AddStop(Stop stop)
+	void TransportCatalogue::AddStop(Stop&& stop)
 	{
 		stops_.push_back(std::move(stop));
 		Stop* stop_ptr = &stops_.back();
@@ -120,7 +120,7 @@ namespace transport_catalogue
 		double compute_length = 0;
 		int get_distance_length = 0;
 		const Bus* bus = FindBus(bus_name);
-		
+
 		if (bus == nullptr)
 		{
 			return std::nullopt;
@@ -164,4 +164,5 @@ namespace transport_catalogue
 		bus_info.curvature = get_distance_length / compute_length;
 		return bus_info;
 	}
+
 }//namespace transport_catalogue

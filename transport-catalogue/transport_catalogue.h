@@ -15,6 +15,7 @@ namespace transport_catalogue
 	{
 		std::string name;
 		geo::Coordinates coordinates;
+
 	};
 
 	struct Bus
@@ -49,9 +50,9 @@ namespace transport_catalogue
 	class TransportCatalogue
 	{
 	public:
-		void AddStop(Stop stop);
+		void AddStop(Stop&& stop);
 
-		const Stop* FindStop(const std::string_view stop) const;
+		const Stop* FindStop(std::string_view stop) const;
 
 		std::optional<std::set<std::string_view>> GetStopBuses(std::string_view stop) const;
 
