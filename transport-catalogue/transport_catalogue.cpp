@@ -50,7 +50,7 @@ namespace transport_catalogue
 		return stopname_to_busnames_.at(stop);
 	}
 
-	void TransportCatalogue::SetDistance(const std::string& stop, std::vector<DistancesToStop>& distances_to_stops)
+	void TransportCatalogue::SetDistance(const std::string& stop, const std::vector<DistancesToStop>& distances_to_stops)
 	{
 		if (distances_to_stops.size() == 0)
 		{
@@ -64,18 +64,18 @@ namespace transport_catalogue
 		}
 	}
 
-	int TransportCatalogue::GetDistance(const Stop* stop_ptr, const Stop* anoter_stop_ptr) const
+	int TransportCatalogue::GetDistance(const Stop* stop_ptr, const Stop* another_stop_ptr) const
 	{
-		auto first_it = stops_distances_.find(std::make_pair(stop_ptr, anoter_stop_ptr));
-		auto second_it = stops_distances_.find(std::make_pair(anoter_stop_ptr, stop_ptr));
+		auto first_it = stops_distances_.find(std::make_pair(stop_ptr, another_stop_ptr));
+		auto second_it = stops_distances_.find(std::make_pair(another_stop_ptr, stop_ptr));
 
 		if (first_it != stops_distances_.end())
 		{
-			return stops_distances_.at(std::make_pair(stop_ptr, anoter_stop_ptr));
+			return stops_distances_.at(std::make_pair(stop_ptr, another_stop_ptr));
 		}
 		else if (second_it != stops_distances_.end())
 		{
-			return stops_distances_.at(std::make_pair(anoter_stop_ptr, stop_ptr));
+			return stops_distances_.at(std::make_pair(another_stop_ptr, stop_ptr));
 		}
 		else
 		{
@@ -83,7 +83,7 @@ namespace transport_catalogue
 		}
 	}
 
-	void TransportCatalogue::AddBus(const std::string name , bool is_circle, std::vector<std::string> stops)
+	void TransportCatalogue::AddBus(const std::string name , bool is_circle, const std::vector<std::string>& stops)
 	{
 		Bus bus_add;
 		std::vector <std::string_view> stops_view;

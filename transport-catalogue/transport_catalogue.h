@@ -56,11 +56,11 @@ namespace transport_catalogue
 
 		std::optional<std::set<std::string_view>> GetStopBuses(std::string_view stop) const;
 
-		void SetDistance(const std::string& stop, std::vector<DistancesToStop>& distances_to_stops);
+		void SetDistance(const std::string& stop, const std::vector<DistancesToStop>& distances_to_stops);
 
-		int GetDistance(const Stop* stop_ptr, const Stop* anoter_stop_ptr) const;
+		int GetDistance(const Stop* stop_ptr, const Stop* another_stop_ptr) const;
 
-		void AddBus(const std::string name , bool is_circle, std::vector<std::string> stops);
+		void AddBus(const std::string name , bool is_circle, const std::vector<std::string>& stops);
 
 		const Bus* FindBus(std::string_view bus) const;
 
