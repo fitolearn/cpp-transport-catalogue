@@ -1,14 +1,18 @@
 #include <iostream>
+#include <fstream>
 
-#include "input_reader.h"
-#include "transport_catalogue.h"
-#include "stat_reader.h"
+#include "json_reader.h"
+
+using namespace std;
+using namespace transport;
+
 int main()
 {
-	transport_catalogue::TransportCatalogue t_c;
-	transport_catalogue::InputReader i_r(t_c);
-	i_r.ReadRequests(std::cin);
-	transport_catalogue::StatReader s_r(t_c);
-	s_r.OutputRequests(std::cin, std::cerr);
-	return 0;
+
+    TransportCatalogue tc;
+    fstream ist("s10_final_opentest_1.json");
+    fstream out("output.txt");
+    //transport::json::InputStatReader{}(cin, cout, tc);
+    transport::json::InputStatReader{}(ist, out, tc);
+
 }
