@@ -1,6 +1,6 @@
 #include "domain.h"
 
-namespace transport {
+namespace transport::domain {
 
     double ComputeDistance(const Stop* lhs, const Stop* rhs) {
         return geo::ComputeDistance(lhs->coordinates_, rhs->coordinates_);

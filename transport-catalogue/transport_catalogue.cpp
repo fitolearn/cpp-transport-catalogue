@@ -3,7 +3,7 @@
 #include <numeric>
 #include <stdexcept>
 using namespace std;
-
+using namespace transport::domain;
 namespace transport {
 
     const std::unordered_set<Bus*>* TransportCatalogue::GetBusesByStop(const Stop* pstop) const {
@@ -129,6 +129,6 @@ namespace transport {
     const std::deque<Bus>& TransportCatalogue::GetBuses() const {
         return buses_storage_;
     }
-}
+}//namespace transport
 
 

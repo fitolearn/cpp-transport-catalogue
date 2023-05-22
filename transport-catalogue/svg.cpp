@@ -1,11 +1,9 @@
 #include "svg.h"
 #include <memory>
-
+using namespace std;
+using namespace std::literals;
 namespace svg {
-
-    using namespace std;
-    using namespace std::literals;
-
+// ---------- RGB ------------------
     Rgb::Rgb(uint8_t r, uint8_t g, uint8_t b) :
             red(r),
             green(g),
@@ -18,7 +16,7 @@ namespace svg {
                    << to_string(rgb.green) << ","s
                    << to_string(rgb.blue) << ")"s;
     }
-
+// ---------- RGBA ------------------
     Rgba::Rgba(uint8_t r, uint8_t g, uint8_t b, double alpha) :
             red(r),
             green(g),
@@ -49,7 +47,7 @@ namespace svg {
     void ColorPrinter::operator()(Rgba rgba) {
         out << rgba;
     }
-
+// ---------- Ostreams ------------------
     ostream& operator<<(ostream& out, Color color) {
         visit(ColorPrinter{out}, color);
         return out;
@@ -85,10 +83,7 @@ namespace svg {
 
     void Object::Render(const RenderContext& context) const {
         context.RenderIndent();
-
-        // Делегируем вывод тега своим подклассам
         RenderObject(context);
-
         context.out << std::endl;
     }
 
@@ -174,16 +169,13 @@ namespace svg {
             << " dx=\""sv << offset_.x << "\""sv
             << " dy=\""sv << offset_.y << "\""sv
             << " font-size=\""sv << size_ << "\""sv;
-
         if (font_family_) {
             out << " font-family=\""sv << *font_family_ << "\""sv;
         }
         if (font_weight_) {
             out << " font-weight=\""sv << *font_weight_ << "\""sv;
         }
-
         RenderAttrs(out);
-
         out << ">"sv;
 
         for (const auto& c : data_) {
@@ -207,9 +199,7 @@ namespace svg {
                     out << c;
                     break;
             }
-        }
-
-        out << "</text>"sv;
+        } out << "</text>"sv;
     }
 
 // ---------- Document ------------------
@@ -226,8 +216,6 @@ namespace svg {
         for (const auto& obj : objects_) {
             obj->Render(ctx);
         }
-
         out << "</svg>"sv;
     }
-
 }  // namespace svg

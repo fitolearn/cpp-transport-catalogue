@@ -1,15 +1,14 @@
 #include "map_renderer.h"
 #include <algorithm>
 #include <sstream>
+using namespace transport::domain;
+using namespace std::string_literals;
 namespace transport::renderer {
 
         svg::Color MapRenderer::ColorToSvg(const Color& color) {
-            using namespace std::string_literals;
-
             if (std::holds_alternative<std::string>(color)) {
                 return std::get<std::string>(color);
             }
-
             if (std::holds_alternative<Rgb>(color)) {
                 const Rgb& rgb = std::get<Rgb>(color);
                 return "rgb("s +
@@ -68,8 +67,6 @@ namespace transport::renderer {
                             SetStrokeWidth(line_width_).
                             SetStrokeLineCap(svg::StrokeLineCap::ROUND).
                             SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
-
-
                     color_palette_counter = (color_palette_counter + 1) % color_palette_.size();
                     document_.Add(std::move(polyline));
                 }
@@ -83,28 +80,25 @@ namespace transport::renderer {
         }
 
         void MapRenderer::SetCommonBusTextSettings(svg::Text& text, const std::string_view bus_name, const svg::Point& position) {
-            text.SetPosition(position)
-                    .SetOffset(bus_label_offset_)
-                    .SetFontSize(bus_label_font_size_)
-                    .SetFontFamily("Verdana")
-                    .SetFontWeight("bold")
-                    .SetData(std::string(bus_name));
+                    text.SetPosition(position);
+                    text.SetOffset(bus_label_offset_);
+                    text.SetFontSize(bus_label_font_size_);
+                    text.SetFontFamily("Verdana");
+                    text.SetFontWeight("bold");
+                    text.SetData(std::move(std::string(bus_name)));
         }
 
         void MapRenderer::AddBusName(const std::string_view name, const Stop* stop, const svg::Color& color) {
             svg::Text substrate;
             svg::Text text;
-
             svg::Point position = (*sphere_projector_)(stop->coordinates_);
-
             SetCommonBusTextSettings(substrate, name, position);
             SetCommonBusTextSettings(text, name, position);
-
-            substrate.SetFillColor(underlayer_color_)
-                    .SetStrokeColor(underlayer_color_)
-                    .SetStrokeWidth(underlayer_width_)
-                    .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
-                    .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
+            substrate.SetFillColor(underlayer_color_);
+            substrate.SetStrokeColor(underlayer_color_);
+            substrate.SetStrokeWidth(underlayer_width_);
+            substrate.SetStrokeLineCap(svg::StrokeLineCap::ROUND);
+            substrate.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
             text.SetFillColor(color);
             document_.Add(std::move(substrate));
             document_.Add(std::move(text));
@@ -114,60 +108,48 @@ namespace transport::renderer {
             size_t color_palette_counter = 0;
             for (const Bus* bus : buses_) {
                 if (bus->stops_.size()) {
-
                     AddBusName(bus->name_, bus->stops_.front(), color_palette_.at(color_palette_counter));
                     if (bus->stops_.front() != bus->stops_.back()) {
                         AddBusName(bus->name_, bus->stops_.back(), color_palette_.at(color_palette_counter));
-                    }
-
-                    color_palette_counter = (color_palette_counter + 1) % color_palette_.size();
+                    } color_palette_counter = (color_palette_counter + 1) % color_palette_.size();
                 }
             }
         }
 
         void MapRenderer::AddStopRounds() {
             for (const Stop* stop : stops_with_buses_) {
-
                 svg::Circle circle;
-
-                circle.SetCenter((*sphere_projector_)(stop->coordinates_))
-                        .SetRadius(stop_radius_)
-                        .SetFillColor("white");
-
+                circle.SetCenter((*sphere_projector_)(stop->coordinates_));
+                circle.SetRadius(stop_radius_);
+                circle.SetFillColor("white");
                 document_.Add(std::move(circle));
             }
 
         }
 
         void MapRenderer::SetCommonStopTextSettings(svg::Text& text, const std::string_view stop_name, const svg::Point& position) {
-            text.SetPosition(position)
-                    .SetOffset(stop_label_offset_)
-                    .SetFontSize(stop_label_font_size_)
-                    .SetFontFamily("Verdana")
-                    .SetData(std::string(stop_name));
+            text.SetPosition(position);
+            text.SetOffset(stop_label_offset_);
+            text.SetFontSize(stop_label_font_size_);
+            text.SetFontFamily("Verdana");
+            text.SetData(std::string(stop_name));
         }
 
         void MapRenderer::AddStopNames() {
             for (const Stop* stop : stops_with_buses_) {
                 svg::Text substrate;
                 svg::Text text;
-
                 svg::Point position = (*sphere_projector_)(stop->coordinates_);
-
                 SetCommonStopTextSettings(substrate, stop->name_, position);
                 SetCommonStopTextSettings(text, stop->name_, position);
-
-                substrate.SetFillColor(underlayer_color_)
-                        .SetStrokeColor(underlayer_color_)
-                        .SetStrokeWidth(underlayer_width_)
-                        .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
-                        .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
-
+                substrate.SetFillColor(underlayer_color_);
+                substrate.SetStrokeColor(underlayer_color_);
+                substrate.SetStrokeWidth(underlayer_width_);
+                substrate.SetStrokeLineCap(svg::StrokeLineCap::ROUND);
+                substrate.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
                 text.SetFillColor("black");
-
                 document_.Add(std::move(substrate));
                 document_.Add(std::move(text));
             }
         }
-
     }//namespace transport

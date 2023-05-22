@@ -2,8 +2,7 @@
 
 #include <cmath>
 
-namespace geo {
-
+namespace transport::geo {
     struct Coordinates {
         double latitude;
         double longitude;
@@ -17,4 +16,4 @@ namespace geo {
 
     double ComputeDistance(Coordinates from, Coordinates to);
 
-} // namespace geo
+}// namespace geo

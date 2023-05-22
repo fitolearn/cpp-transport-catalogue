@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include "geo.h"
 
-namespace transport {
+namespace transport::domain {
 
     struct Stop {
         std::string name_;

@@ -12,7 +12,6 @@ namespace svg {
 
     struct Rgb {
         Rgb() = default;
-
         Rgb(uint8_t r, uint8_t g, uint8_t b);
 
         uint8_t red = 0;
@@ -214,7 +213,6 @@ namespace svg {
 
     private:
         void RenderObject(const RenderContext& context) const override;
-
         Point center_;
         double radius_ = 1.0;
     };
@@ -225,12 +223,10 @@ namespace svg {
  */
     class Polyline : public Object, public PathProps<Polyline> {
     public:
-        // Добавляет очередную вершину к ломаной линии
         Polyline& AddPoint(Point point);
 
     private:
         void RenderObject(const RenderContext& context) const override;
-
         std::vector<Point> points_;
     };
 
@@ -240,27 +236,15 @@ namespace svg {
  */
     class Text : public Object, public PathProps<Text> {
     public:
-        // Задаёт координаты опорной точки (атрибуты x и y)
         Text& SetPosition(Point pos);
-
-        // Задаёт смещение относительно опорной точки (атрибуты dx, dy)
         Text& SetOffset(Point offset);
-
-        // Задаёт размеры шрифта (атрибут font-size)
         Text& SetFontSize(uint32_t size);
-
-        // Задаёт название шрифта (атрибут font-family)
         Text& SetFontFamily(std::string font_family);
-
-        // Задаёт толщину шрифта (атрибут font-weight)
         Text& SetFontWeight(std::string font_weight);
-
-        // Задаёт текстовое содержимое объекта (отображается внутри тега text)
         Text& SetData(std::string data);
 
     private:
         void RenderObject(const RenderContext& context) const override;
-
         Point pos_;
         Point offset_;
         uint32_t size_ = 1;
@@ -272,11 +256,8 @@ namespace svg {
     class Document : public ObjectContainer {
     public:
         void AddPtr(std::unique_ptr<Object>&& obj);
-
         void Render(std::ostream& out) const;
-
     private:
         std::vector<std::unique_ptr<Object>> objects_;
     };
-
 }  // namespace svg

@@ -1,5 +1,5 @@
 #include "geo.h"
- namespace geo {
+ namespace transport::geo {
     double ComputeDistance(Coordinates from, Coordinates to) {
          using namespace std;
          if (from == to) {
@@ -11,4 +11,4 @@
                      + cos(from.latitude * RADIANS_PER_DEGREE) * cos(to.latitude * RADIANS_PER_DEGREE) * cos(abs(from.longitude - to.longitude) * RADIANS_PER_DEGREE))
                 * EARTH_RADIUS;
      }
-}
+}//namespace geo
