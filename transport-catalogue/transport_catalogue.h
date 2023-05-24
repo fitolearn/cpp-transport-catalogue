@@ -26,9 +26,9 @@ namespace transport {
         template<typename Container>
         void AddBus(std::string name, bool circular, const Container& stop_names);
         const domain::Bus* GetBus(const std::string_view bus_name) const;
-        size_t GetStopsCount(const domain::Bus* bus) const;
-        size_t GetUniqueStopsCount(const domain::Bus* bus) const;
-        double GetGeoLength(const domain::Bus* bus) const;
+        static size_t GetStopsCount(const domain::Bus* bus) ;
+        static size_t GetUniqueStopsCount(const domain::Bus* bus) ;
+        static double GetGeoLength(const domain::Bus* bus) ;
         size_t GetLength(const domain::Bus* bus) const;
         const std::deque<domain::Bus>& GetBuses() const;
 
@@ -54,8 +54,8 @@ namespace transport {
     void TransportCatalogue::AddBus(std::string name, bool circular, const Container& stop_names) {
         domain::ConteinerOfStopPointers stops;
 
-        for (auto& name : stop_names) {
-            stops.push_back(stops_[name]);
+        for (auto& stop_name : stop_names) {
+            stops.push_back(stops_[stop_name]);
         }
         std::unordered_set<domain::Stop*> stops_set{ stops.begin(), stops.end() };
         domain::Bus bus{std::move(name), circular, std::move(stops), std::move(stops_set)

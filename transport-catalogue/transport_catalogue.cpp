@@ -12,7 +12,7 @@ namespace transport {
 
     void TransportCatalogue::AddStop(std::string name, geo::Coordinates coordinates) {
 
-        stops_storage_.push_back(Stop{move(name), move(coordinates)});
+        stops_storage_.push_back(Stop{std::move(name), coordinates});
         Stop* pstop = &stops_storage_.back();
         stops_[pstop->name_] = pstop;
         buses_of_stop_[pstop];
@@ -27,15 +27,15 @@ namespace transport {
         return ret;
     }
 
-    size_t TransportCatalogue::GetStopsCount(const Bus *bus) const {
+    size_t TransportCatalogue::GetStopsCount(const Bus *bus) {
         return bus->circular_ ? bus->stops_.size() : bus->stops_.size() * 2 - 1;
     }
 
-    size_t TransportCatalogue::GetUniqueStopsCount(const Bus* bus) const {
+    size_t TransportCatalogue::GetUniqueStopsCount(const Bus* bus) {
         return bus->stops_set_.size();
     }
 
-    double TransportCatalogue::GetGeoLength(const Bus* bus) const {
+    double TransportCatalogue::GetGeoLength(const Bus* bus) {
         double res = transform_reduce(
                 ++bus->stops_.begin(), bus->stops_.end(),
                 bus->stops_.begin(),
@@ -130,5 +130,3 @@ namespace transport {
         return buses_storage_;
     }
 }//namespace transport
-
-

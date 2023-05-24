@@ -14,22 +14,13 @@ namespace json {
     class Node;
     using Dict = std::map<std::string, Node>;
     using Array = std::vector<Node>;
+    using json_variant = std::variant<int,double,std::string,bool,Array,Dict,std::nullptr_t>;
 
     // Эта ошибка должна выбрасываться при ошибках парсинга JSON
     class ParsingError : public std::runtime_error {
     public:
         using runtime_error::runtime_error;
     };
-
-    using json_variant = std::variant<
-            int,
-            double,
-            std::string,
-            bool,
-            Array,
-            Dict,
-            std::nullptr_t
-    >;
 
     class Node: json_variant {
     public:

@@ -20,7 +20,7 @@ namespace transport {
         RequestHandler(const TransportCatalogue& db);
         std::optional<BusStat> GetBusStat(const std::string_view& bus_name) const;
         const std::unordered_set<BusPtr>* GetBusesByStop(const std::string_view& stop_name) const;
-        const std::optional <std::set<std::string_view>> GetSortedBusesByStop(const std::string_view& stop_name) const;
+        std::optional <std::set<std::string_view>> GetSortedBusesByStop(const std::string_view& stop_name) const;
 
     private:
         const TransportCatalogue& db_;

@@ -119,8 +119,8 @@ namespace transport::renderer {
 
         class MapRenderer {
         public:
-            template <typename ForvardIt>
-            MapRenderer(const RenderSettings& settings, ForvardIt begin_buses, ForvardIt end_buses);
+            template <typename ForwardIt>
+            MapRenderer(const RenderSettings& settings, ForwardIt begin_buses, ForwardIt end_buses);
             svg::Color ColorToSvg(const Color& color);
             void Render(std::ostream& os);
             std::string Render();
