@@ -70,7 +70,7 @@ namespace json {
     }
 
     bool Node::operator==(const Node& other) const {
-        return *this == other;
+        return this->AsString() == other.AsString();
     }
 
     bool Node::operator!=(const Node& other) const {
@@ -90,14 +90,14 @@ namespace json {
     Node LoadNode(istream& input);
     Node LoadArray(istream& input) {
         Array result;
-        bool first = true;
+        bool is_first = true;
         char c;
         for (; input >> c && c != ']';) {
-            if(first) {
+            if(is_first) {
                 if (c == ',') {
                     throw ParsingError("Array separator invalid: ,"s);
                 }
-                first = false;
+                is_first = false;
                 input.putback(c);
             } else if (c != ',') {
                 throw ParsingError("Array separator invalid: "s + c);
@@ -109,7 +109,7 @@ namespace json {
             throw ParsingError("Array ] not found"s);
         }
 
-        return Node(move(result));
+        return Node{std::move(result)};
     }
 
     Node LoadDigit(istream& input) {
@@ -282,7 +282,7 @@ namespace json {
     }
 
     Document::Document(Node root)
-            : root_(move(root)) {
+            : root_(std::move(root)) {
     }
     bool Document::operator==(const Document& other) const {
         return root_ == other.root_;
@@ -322,7 +322,7 @@ namespace json {
             } os << '\"';
         }
         void operator()(bool b) {
-            os << b ? "true" : "false";
+            os << (b ? "true" : "false");
         }
         void operator()(const Array& array) {
             os << "[";

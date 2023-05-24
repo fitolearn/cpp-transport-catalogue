@@ -28,23 +28,23 @@ namespace json {
         using Dict = std::map<std::string, Node>;
         using json_variant::variant;
         Node();
-        Node(size_t size);
+        explicit Node (size_t size);
 
-        bool IsInt() const;
-        bool IsDouble() const;
-        bool IsPureDouble() const;
-        bool IsBool() const;
-        bool IsString() const;
-        bool IsNull() const;
-        bool IsArray() const;
-        bool IsMap() const;
+        [[nodiscard]] bool IsInt() const;
+        [[nodiscard]] bool IsDouble() const;
+        [[nodiscard]] bool IsPureDouble() const;
+        [[nodiscard]] bool IsBool() const;
+        [[nodiscard]] bool IsString() const;
+        [[nodiscard]] bool IsNull() const;
+        [[nodiscard]] bool IsArray() const;
+        [[nodiscard]] bool IsMap() const;
 
-        int AsInt() const;
-        bool AsBool() const;
-        double AsDouble() const;
-        const std::string& AsString() const;
-        const Array& AsArray() const;
-        const Dict& AsMap() const;
+        [[nodiscard]] int AsInt() const;
+        [[nodiscard]] bool AsBool() const;
+        [[nodiscard]] double AsDouble() const;
+        [[nodiscard]] const std::string& AsString() const;
+        [[nodiscard]] const Array& AsArray() const;
+        [[nodiscard]] const Dict& AsMap() const;
 
         bool operator==(const Node& other) const;
         bool operator!=(const Node& other) const;

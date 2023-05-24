@@ -132,9 +132,9 @@ namespace transport::reader {
                 return Node(move(result));
             }
             result["curvature"] = request_result->curvature;
-            result["route_length"] = request_result->route_length;
-            result["stop_count"] = request_result->stop_count;
-            result["unique_stop_count"] = request_result->unique_stop_count;
+            result["route_length"] = static_cast<Node>(request_result->route_length);
+            result["stop_count"] = static_cast<Node>(request_result->stop_count);
+            result["unique_stop_count"] = static_cast<Node>(request_result->unique_stop_count);
             return Node(move(result));
         }
 
@@ -189,4 +189,4 @@ namespace transport::reader {
             } return ::json::Node{ move(result) };
         }
     } //namespace json
-} //namespace transport
+} //namespace transport::reader
