@@ -109,6 +109,13 @@ build CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/svg.cpp.o: CXX_
   OBJECT_DIR = CMakeFiles/cpp_transport_catalogue.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue
 
+build CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json_builder.cpp.o: CXX_COMPILER__cpp_transport_catalogue_Debug /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/transport-catalogue/json_builder.cpp || cmake_object_order_depends_target_cpp_transport_catalogue
+  DEP_FILE = CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json_builder.cpp.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.6
+  INCLUDES = -I/Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/transport-catalogue
+  OBJECT_DIR = CMakeFiles/cpp_transport_catalogue.dir
+  OBJECT_FILE_DIR = CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target cpp_transport_catalogue
@@ -117,7 +124,7 @@ build CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/svg.cpp.o: CXX_
 #############################################
 # Link the executable cpp_transport_catalogue
 
-build cpp_transport_catalogue: CXX_EXECUTABLE_LINKER__cpp_transport_catalogue_Debug CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/main.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/transport_catalogue.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/geo.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/domain.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json_reader.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/map_renderer.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/request_handler.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/svg.cpp.o
+build cpp_transport_catalogue: CXX_EXECUTABLE_LINKER__cpp_transport_catalogue_Debug CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/main.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/transport_catalogue.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/geo.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/domain.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json_reader.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/map_renderer.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/request_handler.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/svg.cpp.o CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json_builder.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.6
   OBJECT_DIR = CMakeFiles/cpp_transport_catalogue.dir
   POST_BUILD = :

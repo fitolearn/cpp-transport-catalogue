@@ -22,4 +22,6 @@ add_executable(cpp_transport_catalogue
         transport-catalogue/request_handler.cpp
         transport-catalogue/request_handler.h
         transport-catalogue/svg.cpp
-        transport-catalogue/svg.h)
+        transport-catalogue/svg.h
+        transport-catalogue/json_builder.cpp
+        transport-catalogue/json_builder.h)

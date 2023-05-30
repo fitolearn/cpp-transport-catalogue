@@ -4,8 +4,10 @@ using namespace std;
 
 namespace json {
 
+    Node::Node(Value value) : variant(std::move(value)) {}
+
     bool Node::IsInt() const {
-        return holds_alternative<int>(*this);
+        return holds_alternative<int>(*this); // true if the variant currently holds the alternative T, false otherwise.
     }
     bool Node::IsDouble() const {
         return IsInt() || IsPureDouble();
@@ -48,7 +50,7 @@ namespace json {
         if(IsInt()) {
             return std::get<int>(*this);
         }
-        throw std::logic_error("Node is not double or int");
+        throw std::logic_error("Node is not double");
     }
     const std::string& Node::AsString() const {
         if(IsString()) {
@@ -81,35 +83,42 @@ namespace json {
         return this->AsString() == str;
     }
 
-    Node::Node(): Node{nullptr} {
-    }
-    Node::Node(size_t size): Node(static_cast<int>(size)) {
+    Node::Node(): Node{nullptr} {}
+    Node::Node(size_t size) : Node(static_cast<int>(size)) {}
 
+    Dict& Node::AsMap() {
+        using namespace std::literals;
+        if (!IsMap()) {
+            throw std::logic_error("Not a dict"s);
+        } return std::get<Dict>(*this);
+    }
+
+    Array& Node::AsArray() {
+        using namespace std::literals;
+        if (!IsArray()) {
+            throw std::logic_error("Not an array"s);
+        } return std::get<Array>(*this);
     }
 
     Node LoadNode(istream& input);
     Node LoadArray(istream& input) {
         Array result;
-        bool is_first = true;
+        bool first = true;
         char c;
         for (; input >> c && c != ']';) {
-            if(is_first) {
+            if(first) {
                 if (c == ',') {
-                    throw ParsingError("Array separator invalid: ,"s);
+                    throw ParsingError("Array separator invalid: "s + c);
                 }
-                is_first = false;
+                first = false;
                 input.putback(c);
             } else if (c != ',') {
                 throw ParsingError("Array separator invalid: "s + c);
-            }
-            result.push_back(LoadNode(input));
+            } result.push_back(LoadNode(input));
         }
-
         if(c != ']') {
             throw ParsingError("Array ] not found"s);
-        }
-
-        return Node{std::move(result)};
+        } return Node(move(result));
     }
 
     Node LoadDigit(istream& input) {
@@ -127,7 +136,6 @@ namespace json {
             }
             digit.push_back(input.get());
         }
-
         while(isdigit(input.peek())) {
             input >> temp;
             digit.push_back(temp);
@@ -150,12 +158,10 @@ namespace json {
                 digit.push_back(temp);
             }
         }
-
         temp = input.peek();
         if(temp != 'e' && temp != 'E') {
             return Node(stod(digit));
         }
-
         digit.push_back(input.get());
         temp = input.peek();
         if(temp != '+' && temp != '-' && !isdigit(temp)) {
@@ -183,17 +189,10 @@ namespace json {
             if(c == '\\') {
                 c = input.get();
                 switch(c) {
-                    case 'n':
-                        line.push_back('\n');
-                        break;
-                    case 'r':
-                        line.push_back('\r');
-                        break;
-                    case 't':
-                        line.push_back('\t');
-                        break;
-                    default:
-                        line.push_back(c);
+                    case 'n': line.push_back('\n'); break;
+                    case 'r': line.push_back('\r'); break;
+                    case 't': line.push_back('\t'); break;
+                    default: line.push_back(c);
                 }
             } else {
                 line.push_back(c);
@@ -202,7 +201,7 @@ namespace json {
         if(c != '\"') {
             throw ParsingError("String is not closed"s);
         }
-        return Node(move(line));
+        return Node(std::move(line));
     }
 
     Node LoadDict(istream& input) {
@@ -220,11 +219,9 @@ namespace json {
             } else {
                 input >> c;
             }
-
             if(c != '\"') {
                 throw ParsingError("Dict error format \" != "s + c);
             }
-
             string key = LoadString(input).AsString();
             if(!(input >> c)) {
                 throw ParsingError("Dict } not found"s);
@@ -232,21 +229,18 @@ namespace json {
             if(c != ':') {
                 throw ParsingError("Dict error format : != "s + c);
             }
-            result.insert({move(key), LoadNode(input)});
+            result.insert({std::move(key), LoadNode(input)});
         }
         if(c != '}') {
             throw ParsingError("Dict } not found"s);
         }
-        return Node(move(result));
+        return Node(std::move(result));
     }
 
     Node LoadNull(istream& input) {
-
         if(input.get() == 'u' && input.get() == 'l' && input.get() == 'l') {
             return Node(nullptr);
-        }
-
-        throw ParsingError("null invalid"s);
+        } throw ParsingError("null invalid"s);
     }
 
     Node LoadBool(istream& input) {
@@ -302,7 +296,6 @@ namespace json {
 
     struct NodePrinter {
         std::ostream& os;
-
         void operator()(int value) {
             os << value;
         }
@@ -316,6 +309,7 @@ namespace json {
                     case '\n': os << "\\n"; break;
                     case '\r': os << "\\r"; break;
                     case '\"': os << "\\\""; break;
+                        //case '\t': os << "\t"; break;
                     case '\\': os << "\\\\"; break;
                     default: os << c; break;
                 }
@@ -348,33 +342,29 @@ namespace json {
                 Node(key).Print(os);
                 os << ": ";
                 node.Print(os);
-            } os << " }";
+            }
+            os << " }";
         }
         void operator()(std::nullptr_t) {
             os << "null";
         }
     };
-
     std::ostream& Node::Print(std::ostream& os) const {
         visit(NodePrinter{os}, *dynamic_cast<const json_variant*>(this));
         return os;
     }
-
     std::string Node::Print() const {
         std::stringstream ret;
         Print(ret);
         return ret.str();
     }
-
     void Print(const Document& doc, std::ostream& output) {
         doc.GetRoot().Print(output);
     }
-
     Document LoadJSON(const std::string& s) {
         std::istringstream strm(s);
         return Load(strm);
     }
-
     std::string Print(const Node& node) {
         std::ostringstream out;
         Print(Document{ node }, out);

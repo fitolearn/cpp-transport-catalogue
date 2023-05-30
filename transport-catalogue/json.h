@@ -14,7 +14,6 @@ namespace json {
     class Node;
     using Dict = std::map<std::string, Node>;
     using Array = std::vector<Node>;
-    using json_variant = std::variant<int,double,std::string,bool,Array,Dict,std::nullptr_t>;
 
     // Эта ошибка должна выбрасываться при ошибках парсинга JSON
     class ParsingError : public std::runtime_error {
@@ -22,29 +21,36 @@ namespace json {
         using runtime_error::runtime_error;
     };
 
-    class Node: json_variant {
+    using json_variant = std::variant<std::nullptr_t, int, double, std::string, bool, Array, Dict>;
+
+    class Node: private json_variant {
     public:
         using Array = std::vector<Node>;
         using Dict = std::map<std::string, Node>;
+
         using json_variant::variant;
+        using Value = variant;
         Node();
-        explicit Node (size_t size);
+        Node(size_t size);
+        Node(Value value);
 
-        [[nodiscard]] bool IsInt() const;
-        [[nodiscard]] bool IsDouble() const;
-        [[nodiscard]] bool IsPureDouble() const;
-        [[nodiscard]] bool IsBool() const;
-        [[nodiscard]] bool IsString() const;
-        [[nodiscard]] bool IsNull() const;
-        [[nodiscard]] bool IsArray() const;
-        [[nodiscard]] bool IsMap() const;
+        bool IsInt() const;
+        bool IsDouble() const;// Возвращает true, если в Node хранится int либо double
+        bool IsPureDouble() const;// Возвращает true, если в Node хранится double и только double
+        bool IsBool() const;
+        bool IsString() const;
+        bool IsNull() const;
+        bool IsArray() const;
+        bool IsMap() const;
 
-        [[nodiscard]] int AsInt() const;
-        [[nodiscard]] bool AsBool() const;
-        [[nodiscard]] double AsDouble() const;
-        [[nodiscard]] const std::string& AsString() const;
-        [[nodiscard]] const Array& AsArray() const;
-        [[nodiscard]] const Dict& AsMap() const;
+        int AsInt() const;
+        bool AsBool() const;
+        double AsDouble() const;
+        const std::string& AsString() const;
+        const Array& AsArray() const;
+        Array& AsArray();
+        const Dict& AsMap() const;
+        Dict& AsMap();
 
         bool operator==(const Node& other) const;
         bool operator!=(const Node& other) const;
@@ -57,8 +63,7 @@ namespace json {
     class Document {
     public:
         explicit Document(Node root);
-
-        const Node& GetRoot() const;
+        [[nodiscard]] const Node& GetRoot() const;
 
         bool operator==(const Document& other) const;
         bool operator!=(const Document& other) const;
@@ -68,6 +73,6 @@ namespace json {
 
     Document Load(std::istream& input);
     void Print(const Document& doc, std::ostream& output);
-    Document LoadJSON(const std::string& s); // Unused
-    std::string Print(const Node& node); // Unused
+    Document LoadJSON(const std::string& s);
+    std::string Print(const Node& node);
 }  // namespace json
