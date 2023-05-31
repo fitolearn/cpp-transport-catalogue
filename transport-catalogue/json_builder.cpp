@@ -1,26 +1,26 @@
 #include <iostream>
 #include "json_builder.h"
 namespace json {
+
     BuilderBase::BuilderBase() {}
 
     void BuilderBase::ThrowIfReady() {
-        if(context_stack_.size() == 0) {
+        if(context_stack_.empty()) {
             throw std::logic_error("Object already ready");
         }
     }
 
-    BuilderBase& BuilderBase::Key(std::string key) {
+    BuilderBase& BuilderBase::Key(const std::string& key) {
         ThrowIfReady();
-
-        if(context_stack_.back()->IsMap() == false) {
+        if(!context_stack_.back()->IsMap()) {
             throw std::logic_error("Call Key for not Dict");
         }
         context_stack_.push_back(&context_stack_.back()->AsMap()[key]);
         return *this;
     }
+
     BuilderBase& BuilderBase::Value(Node::Value value) {
         ThrowIfReady();
-
         if(context_stack_.back()->IsNull()) {
             *context_stack_.back() = std::move(value);
             context_stack_.pop_back();
@@ -33,6 +33,7 @@ namespace json {
         }
         throw std::logic_error("Set value for invalid Node");
     }
+
     BuilderBase& BuilderBase::StartDict() {
         ThrowIfReady();
         if(context_stack_.back()->IsNull()) {
@@ -46,6 +47,7 @@ namespace json {
         }
         throw std::logic_error("Start dict for invalid Node");
     }
+
     BuilderBase& BuilderBase::StartArray() {
         ThrowIfReady();
         if(context_stack_.back()->IsNull()) {
@@ -59,6 +61,7 @@ namespace json {
         }
         throw std::logic_error("Start array for invalid Node");
     }
+
     BuilderBase& BuilderBase::EndDict() {
         ThrowIfReady();
         if(context_stack_.back()->IsMap()) {
@@ -67,6 +70,7 @@ namespace json {
         }
         throw std::logic_error("End dict for invalid Node");
     }
+
     BuilderBase& BuilderBase::EndArray() {
         ThrowIfReady();
         if(context_stack_.back()->IsArray()) {
@@ -75,6 +79,7 @@ namespace json {
         }
         throw std::logic_error("End array for invalid Node");
     }
+
     Node BuilderBase::Build() {
         if(context_stack_.size() != 0) {
             throw std::logic_error("Build for not ready builder");
@@ -94,10 +99,12 @@ namespace json {
         builder_->Value(std::move(value));
         return BuilderComplete{builder_};
     }
+
     DictBuilder<BuilderComplete> Builder::StartDict() {
         builder_->StartDict();
         return DictBuilder<BuilderComplete>{builder_};
     }
+
     ArrayBuilder<BuilderComplete> Builder::StartArray() {
         builder_->StartArray();
         return ArrayBuilder<BuilderComplete>{builder_};

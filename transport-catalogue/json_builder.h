@@ -10,7 +10,7 @@ namespace json {
     class BuilderBase {
     public:
         BuilderBase();
-        BuilderBase& Key(std::string);
+        BuilderBase& Key(const std::string&);
         BuilderBase& Value(Node::Value);
         BuilderBase& StartDict();
         BuilderBase& StartArray();
@@ -19,80 +19,73 @@ namespace json {
         Node Build();
     private:
         Node root_;
-        std::vector<Node*> context_stack_{&root_};
+        std::vector<Node*> context_stack_ {&root_};
         void ThrowIfReady(); // throw std::logic_error("Object already ready"), if stack size = 0
     };
 
-
-    template <typename EndReturnClass>
+    template <typename T>
     class DictBuilder;
-    template <typename EndReturnClass>
+    template <typename T>
     class ArrayBuilder;
 
-    template <typename ReturnClass>
+    template <typename BuildClass>
     class DictValueBuilder {
+    private:
+        std::shared_ptr<BuilderBase> builder_;
     public:
+        explicit DictValueBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {}
 
-        DictValueBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {
-
-        }
-
-        ReturnClass Value(Node::Value value) {
+        BuildClass Value(Node::Value value) {
             builder_->Value(std::move(value));
-            return ReturnClass{builder_};
+            return BuildClass{ builder_ };
         }
-        DictBuilder<ReturnClass> StartDict() {
+        DictBuilder<BuildClass> StartDict() {
             builder_->StartDict();
-            return DictBuilder<ReturnClass>{builder_};
+            return DictBuilder<BuildClass>{ builder_ };
         }
-        ArrayBuilder<ReturnClass> StartArray() {
+        ArrayBuilder<BuildClass> StartArray() {
             builder_->StartArray();
-            return ArrayBuilder<ReturnClass>{builder_};
+            return ArrayBuilder<BuildClass>{ builder_ };
         }
-
-    private:
-        std::shared_ptr<BuilderBase> builder_;
     };
 
-    template <typename EndReturnClass>
+    template <typename DictClass>
     class DictBuilder {
-    public:
-        DictBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {
-
-        }
-        DictValueBuilder<DictBuilder<EndReturnClass>> Key(std::string key) {
-            builder_->Key(std::move(key));
-            return DictValueBuilder<DictBuilder<EndReturnClass>>{builder_};
-        }
-        EndReturnClass EndDict() {
-            builder_->EndDict();
-            return EndReturnClass{builder_};
-        }
     private:
         std::shared_ptr<BuilderBase> builder_;
+    public:
+        explicit DictBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {}
+
+        DictValueBuilder<DictBuilder<DictClass>> Key(std::string key) {
+            builder_->Key(std::move(key));
+            return DictValueBuilder<DictBuilder<DictClass>>{builder_};
+        }
+        DictClass EndDict() {
+            builder_->EndDict();
+            return DictClass{builder_};
+        }
     };
 
-    template <typename EndReturnClass>
+    template <typename ArrayClass>
     class ArrayBuilder {
     public:
-        ArrayBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {
+        explicit ArrayBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {}
 
-        }
-        ArrayBuilder<EndReturnClass>& Value(Node::Value value) {
+        ArrayBuilder<ArrayClass>& Value(Node::Value value) {
             builder_->Value(std::move(value));
-            return *this;//ArrayBuilder<EndReturnClass>{std::move(builder_)};
+            return *this;
         }
-        DictBuilder<ArrayBuilder<EndReturnClass>> StartDict() {
+        DictBuilder<ArrayBuilder<ArrayClass>> StartDict() {
             builder_->StartDict();
-            return DictBuilder<ArrayBuilder<EndReturnClass>>{builder_};
+            return DictBuilder<ArrayBuilder<ArrayClass>>{builder_};
         }
-        ArrayBuilder<ArrayBuilder<EndReturnClass>> StartArray() {
+        ArrayBuilder<ArrayBuilder<ArrayClass>> StartArray() {
             builder_->StartArray();
-            return ArrayBuilder<ArrayBuilder<EndReturnClass>>{builder_};
+            return ArrayBuilder<ArrayBuilder<ArrayClass>>{builder_};
         }
-        EndReturnClass EndArray() {
+        ArrayClass EndArray() {
             builder_->EndArray();
-            return EndReturnClass{builder_};
+            return ArrayClass{builder_};
         }
     private:
         std::shared_ptr<BuilderBase> builder_;
