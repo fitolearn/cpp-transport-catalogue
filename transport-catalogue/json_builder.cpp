@@ -39,13 +39,7 @@ namespace json {
 
     ArrayItemContext::ArrayItemContext(Builder &builder) : BaseContext(builder) {}
 
-    ArrayValueItemContext ArrayItemContext::Value(Node value) {
-        return BaseContext::Value(move(value));
-    }
-
-    ArrayValueItemContext::ArrayValueItemContext(Builder &builder) : BaseContext(builder) {}
-
-    ArrayValueItemContext ArrayValueItemContext::Value(Node value) {
+    ArrayItemContext ArrayItemContext::Value(Node value) {
         return BaseContext::Value(move(value));
     }
 
