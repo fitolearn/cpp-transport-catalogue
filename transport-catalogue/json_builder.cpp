@@ -1,112 +1,129 @@
-#include <iostream>
 #include "json_builder.h"
+
+using namespace std;
 namespace json {
 
-    BuilderBase::BuilderBase() {}
+    BaseContext::BaseContext(Builder &builder) : builder_(builder) {}
 
-    void BuilderBase::ThrowIfReady() {
-        if(context_stack_.empty()) {
-            throw std::logic_error("Object already ready");
-        }
+    DictItemContext BaseContext::StartDict() {
+        return builder_.StartDict();
     }
 
-    BuilderBase& BuilderBase::Key(const std::string& key) {
-        ThrowIfReady();
-        if(!context_stack_.back()->IsMap()) {
-            throw std::logic_error("Call Key for not Dict");
+    ArrayItemContext BaseContext::StartArray() {
+        return builder_.StartArray();
+    }
+
+    Builder &BaseContext::EndArray() {
+        return builder_.EndArray();
+    }
+
+    Builder &BaseContext::EndDict() {
+        return builder_.EndDict();
+    }
+
+    KeyItemContext BaseContext::Key(std::string key) {
+        return builder_.Key(move(key));
+    }
+
+    Builder &BaseContext::Value(Node value) {
+        return builder_.Value(move(value));
+    }
+
+    KeyItemContext::KeyItemContext(Builder &builder) : BaseContext(builder) {}
+
+    KeyValueItemContext KeyItemContext::Value(Node value) {
+        return BaseContext::Value(move(value));
+    }
+
+    KeyValueItemContext::KeyValueItemContext(Builder &builder) : BaseContext(builder) {}
+
+    DictItemContext::DictItemContext(Builder &builder) : BaseContext(builder) {}
+
+    ArrayItemContext::ArrayItemContext(Builder &builder) : BaseContext(builder) {}
+
+    ArrayValueItemContext ArrayItemContext::Value(Node value) {
+        return BaseContext::Value(move(value));
+    }
+
+    ArrayValueItemContext::ArrayValueItemContext(Builder &builder) : BaseContext(builder) {}
+
+    ArrayValueItemContext ArrayValueItemContext::Value(Node value) {
+        return BaseContext::Value(move(value));
+    }
+
+    Builder::Builder() {
+        nodes_stack_.push_back(&root_);
+    }
+
+    DictItemContext Builder::StartDict() {
+        if (nodes_stack_.empty() || (!nodes_stack_.back()->IsNull() && !nodes_stack_.back()->IsArray())) {
+            throw std::logic_error("You start dict either in empty object or not in array");
         }
-        context_stack_.push_back(&context_stack_.back()->AsMap()[key]);
+        if (nodes_stack_.back()->IsArray()) {
+            const_cast<Array &>(nodes_stack_.back()->AsArray()).push_back(Dict());
+            Node* node = &const_cast<Array &>(nodes_stack_.back()->AsArray()).back();
+            nodes_stack_.push_back(node);
+        } else {
+            *nodes_stack_.back() = Dict();
+        }
         return *this;
     }
 
-    BuilderBase& BuilderBase::Value(Node::Value value) {
-        ThrowIfReady();
-        if(context_stack_.back()->IsNull()) {
-            *context_stack_.back() = std::move(value);
-            context_stack_.pop_back();
-            return *this;
+    ArrayItemContext Builder::StartArray() {
+        if (nodes_stack_.empty() || (!nodes_stack_.back()->IsNull() && !nodes_stack_.back()->IsArray())) {
+            throw std::logic_error("You start dict either in empty object or not in array");
         }
-        if(context_stack_.back()->IsArray()) {
-            Array& arr = context_stack_.back()->AsArray();
-            arr.push_back(Node(std::move(value)));
-            return *this;
+        if (nodes_stack_.back()->IsArray()) {
+            const_cast<Array &>(nodes_stack_.back()->AsArray()).push_back(Array());
+            Node* node = &const_cast<Array &>(nodes_stack_.back()->AsArray()).back();
+            nodes_stack_.push_back(node);
+        } else {
+            *nodes_stack_.back() = Array();
         }
-        throw std::logic_error("Set value for invalid Node");
+        return *this;
     }
 
-    BuilderBase& BuilderBase::StartDict() {
-        ThrowIfReady();
-        if(context_stack_.back()->IsNull()) {
-            *context_stack_.back() = Dict{};
-            return *this;
+    Builder &Builder::EndDict() {
+        if (nodes_stack_.empty() || !nodes_stack_.back()->IsMap()) {
+            throw std::logic_error("You end dict either in empty object or not in dict");
         }
-        if(context_stack_.back()->IsArray()) {
-            context_stack_.back()->AsArray().push_back(Dict{});
-            context_stack_.push_back(&(context_stack_.back()->AsArray().back()));
-            return *this;
+        nodes_stack_.erase(nodes_stack_.end() - 1);
+        return *this;
+    }
+
+    Builder &Builder::EndArray() {
+        if (nodes_stack_.empty() || !nodes_stack_.back()->IsArray()) {
+            throw std::logic_error("You end array either in empty object or not in array");
         }
-        throw std::logic_error("Start dict for invalid Node");
+        nodes_stack_.erase(nodes_stack_.end() - 1);
+        return *this;
     }
 
-    BuilderBase& BuilderBase::StartArray() {
-        ThrowIfReady();
-        if(context_stack_.back()->IsNull()) {
-            *context_stack_.back() = Array{};
-            return *this;
+    KeyItemContext Builder::Key(std::string key) {
+        if (nodes_stack_.empty() || !nodes_stack_.back()->IsMap()) {
+            throw std::logic_error("You try to insert key either in ready object or not in dict");
         }
-        if(context_stack_.back()->IsArray()) {
-            context_stack_.back()->AsArray().push_back(Array{});
-            context_stack_.push_back(&(context_stack_.back()->AsArray().back()));
-            return *this;
+        nodes_stack_.emplace_back(&const_cast<Dict&>(nodes_stack_.back()->AsMap())[key]);
+        return *this;
+    }
+
+    Builder &Builder::Value(const Node& value) {
+        if (nodes_stack_.empty() || (!nodes_stack_.back()->IsNull() && !nodes_stack_.back()->IsArray())) {
+            throw std::logic_error("You try to add value either in ready object or not in array");
         }
-        throw std::logic_error("Start array for invalid Node");
-    }
-
-    BuilderBase& BuilderBase::EndDict() {
-        ThrowIfReady();
-        if(context_stack_.back()->IsMap()) {
-            context_stack_.pop_back();
-            return *this;
+        if (nodes_stack_.back()->IsArray()) {
+            const_cast<Array &>(nodes_stack_.back()->AsArray()).push_back(value);
+        } else {
+            *nodes_stack_.back() = value;
+            nodes_stack_.erase(nodes_stack_.end() - 1);
         }
-        throw std::logic_error("End dict for invalid Node");
+        return *this;
     }
 
-    BuilderBase& BuilderBase::EndArray() {
-        ThrowIfReady();
-        if(context_stack_.back()->IsArray()) {
-            context_stack_.pop_back();
-            return *this;
+    Node Builder::Build() {
+        if (!nodes_stack_.empty()) {
+            throw std::logic_error("You are trying to build an object before it is ready");
         }
-        throw std::logic_error("End array for invalid Node");
+        return root_;
     }
-
-    Node BuilderBase::Build() {
-        if(context_stack_.size() != 0) {
-            throw std::logic_error("Build for not ready builder");
-        }
-        return std::move(root_);
-    }
-
-    BuilderComplete::BuilderComplete(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {}
-
-    Node BuilderComplete::Build() {
-        return builder_->Build();
-    }
-
-    Builder::Builder(): builder_{std::make_shared<BuilderBase>()} {}
-
-    BuilderComplete Builder::Value(Node::Value value) {
-        builder_->Value(std::move(value));
-        return BuilderComplete{builder_};
-    }
-
-    DictBuilder<BuilderComplete> Builder::StartDict() {
-        builder_->StartDict();
-        return DictBuilder<BuilderComplete>{builder_};
-    }
-
-    ArrayBuilder<BuilderComplete> Builder::StartArray() {
-        builder_->StartArray();
-        return ArrayBuilder<BuilderComplete>{builder_};
-    }
-}//namespace json
+}

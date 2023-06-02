@@ -1,111 +1,96 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <memory> // shared_ptr
 
 #include "json.h"
 
 namespace json {
 
-    class BuilderBase {
+    class Builder;
+    class DictItemContext;
+    class KeyItemContext;
+    class KeyValueItemContext;
+    class ArrayItemContext;
+    class ArrayValueItemContext;
+
+    class BaseContext {
     public:
-        BuilderBase();
-        BuilderBase& Key(const std::string&);
-        BuilderBase& Value(Node::Value);
-        BuilderBase& StartDict();
-        BuilderBase& StartArray();
-        BuilderBase& EndDict();
-        BuilderBase& EndArray();
-        Node Build();
+        BaseContext(Builder& builder);
+
+        DictItemContext StartDict();
+        ArrayItemContext StartArray();
+        Builder& EndDict();
+        Builder& EndArray();
+        KeyItemContext Key(std::string key);
+
+        Builder& Value(Node value);
+
     private:
-        Node root_;
-        std::vector<Node*> context_stack_ {&root_};
-        void ThrowIfReady(); // throw std::logic_error("Object already ready"), if stack size = 0
+        Builder& builder_;
     };
 
-    template <typename T>
-    class DictBuilder;
-    template <typename T>
-    class ArrayBuilder;
-
-    template <typename BuildClass>
-    class DictValueBuilder {
-    private:
-        std::shared_ptr<BuilderBase> builder_;
+    class KeyItemContext : public BaseContext {
     public:
-        explicit DictValueBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {}
+        KeyItemContext(Builder& builder);
+        KeyValueItemContext Value(Node value);
 
-        BuildClass Value(Node::Value value) {
-            builder_->Value(std::move(value));
-            return BuildClass{ builder_ };
-        }
-        DictBuilder<BuildClass> StartDict() {
-            builder_->StartDict();
-            return DictBuilder<BuildClass>{ builder_ };
-        }
-        ArrayBuilder<BuildClass> StartArray() {
-            builder_->StartArray();
-            return ArrayBuilder<BuildClass>{ builder_ };
-        }
+        Builder& EndDict() = delete;
+        Builder& EndArray() = delete;
+        Builder& Key(std::string key) = delete;
     };
 
-    template <typename DictClass>
-    class DictBuilder {
-    private:
-        std::shared_ptr<BuilderBase> builder_;
+    class KeyValueItemContext : public BaseContext {
     public:
-        explicit DictBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {}
+        KeyValueItemContext(Builder& builder);
 
-        DictValueBuilder<DictBuilder<DictClass>> Key(std::string key) {
-            builder_->Key(std::move(key));
-            return DictValueBuilder<DictBuilder<DictClass>>{builder_};
-        }
-        DictClass EndDict() {
-            builder_->EndDict();
-            return DictClass{builder_};
-        }
+        DictItemContext StartDict() = delete;
+        ArrayItemContext StartArray() = delete;
+        Builder& EndArray() = delete;
+        Builder& Value(Node value) = delete;
     };
 
-    template <typename ArrayClass>
-    class ArrayBuilder {
+    class DictItemContext : public BaseContext{
     public:
-        explicit ArrayBuilder(std::shared_ptr<BuilderBase> base): builder_{std::move(base)} {}
+        DictItemContext(Builder& builder);
 
-        ArrayBuilder<ArrayClass>& Value(Node::Value value) {
-            builder_->Value(std::move(value));
-            return *this;
-        }
-        DictBuilder<ArrayBuilder<ArrayClass>> StartDict() {
-            builder_->StartDict();
-            return DictBuilder<ArrayBuilder<ArrayClass>>{builder_};
-        }
-        ArrayBuilder<ArrayBuilder<ArrayClass>> StartArray() {
-            builder_->StartArray();
-            return ArrayBuilder<ArrayBuilder<ArrayClass>>{builder_};
-        }
-        ArrayClass EndArray() {
-            builder_->EndArray();
-            return ArrayClass{builder_};
-        }
-    private:
-        std::shared_ptr<BuilderBase> builder_;
+        DictItemContext StartDict() = delete;
+        ArrayItemContext StartArray() = delete;
+        Builder& EndArray() = delete;
+        Builder& Value(Node value) = delete;
+        Node Build() = delete;
     };
 
-    class BuilderComplete {
+    class ArrayItemContext : public BaseContext {
     public:
-        BuilderComplete(std::shared_ptr<BuilderBase> base);
-        Node Build();
-    private:
-        std::shared_ptr<BuilderBase> builder_;
+        ArrayItemContext(Builder& builder);
+        ArrayValueItemContext Value(Node value);
+
+        Builder& EndDict() = delete;
+        KeyItemContext Key(std::string key) = delete;
+    };
+
+    class ArrayValueItemContext : public BaseContext {
+    public:
+        ArrayValueItemContext(Builder& builder);
+        ArrayValueItemContext Value(Node value);
+
+        Builder& EndDict() = delete;
+        KeyItemContext Key(std::string key) = delete;
     };
 
     class Builder {
     public:
         Builder();
-        BuilderComplete Value(Node::Value);
-        DictBuilder<BuilderComplete> StartDict();
-        ArrayBuilder<BuilderComplete> StartArray();
+
+        DictItemContext StartDict();
+        ArrayItemContext StartArray();
+
+        Builder& EndDict();
+        Builder& EndArray();
+        Builder& Value(const Node& value);
+
+        KeyItemContext Key(std::string key);
+        Node Build();
     private:
-        std::shared_ptr<BuilderBase> builder_;
+        Node root_;
+        std::vector<Node*> nodes_stack_;
     };
-}//namespace json
+}

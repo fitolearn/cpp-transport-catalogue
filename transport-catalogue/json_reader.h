@@ -26,5 +26,5 @@ namespace transport::reader{
             Node StopRequest(const Dict& request, const TransportCatalogue& transport_catalogue);
             Node MapRequest(const Dict& request, const TransportCatalogue& transport_catalogue);
         };
-    }
+    }// namespace json
 }// namespace transport::reader
