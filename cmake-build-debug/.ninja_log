@@ -15,3 +15,6 @@
 1	783	1685705666883172811	CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/main.cpp.o	64f0dc44ef915f31
 0	925	1685705886771337661	CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/main.cpp.o	64f0dc44ef915f31
 925	986	1685705886833103876	cpp_transport_catalogue	b848e794da19b4d3
+1	954	1685722512851023437	CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/json_builder.cpp.o	93adb2ed1553d9ed
+0	762	1685722526698237761	CMakeFiles/cpp_transport_catalogue.dir/transport-catalogue/main.cpp.o	64f0dc44ef915f31
+762	830	1685722526766138450	cpp_transport_catalogue	b848e794da19b4d3

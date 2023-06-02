@@ -31,11 +31,9 @@ namespace json {
 
     KeyItemContext::KeyItemContext(Builder &builder) : BaseContext(builder) {}
 
-    KeyValueItemContext KeyItemContext::Value(Node value) {
+    KeyItemContext KeyItemContext::Value(Node value) {
         return BaseContext::Value(move(value));
     }
-
-    KeyValueItemContext::KeyValueItemContext(Builder &builder) : BaseContext(builder) {}
 
     DictItemContext::DictItemContext(Builder &builder) : BaseContext(builder) {}
 

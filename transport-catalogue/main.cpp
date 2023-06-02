@@ -3,13 +3,14 @@
 #include "json_reader.h"
 #include "json_builder.h"
 
-#define JSON_TEST1
-//#define JSON_TEST2
-//#define JSON_TEST3
-//#define JSON_TEST4
-//#define JSON_TEST5
-//#define JSON_TEST6
-
+//#define JSON_TEST1
+/*
+#define JSON_TEST2
+#define JSON_TEST3
+#define JSON_TEST4
+#define JSON_TEST5
+#define JSON_TEST6
+*/
 
 using namespace std;
 using namespace transport;
@@ -19,10 +20,10 @@ int main()
 {
     // automatic test 11 sprint
 
-    TransportCatalogue tc;
-    fstream ist("s10_final_opentest_1.json");
-    fstream out("output.txt");
-    transport::reader::json::InputStatReader{}(ist, out, tc);
+    //TransportCatalogue tc;
+    //fstream ist("s10_final_opentest_1.json");
+    //fstream out("output.txt");
+    //transport::reader::json::InputStatReader{}(ist, out, tc);
 
     // manual test 11 sprint
 
