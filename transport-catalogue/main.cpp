@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "json_reader.h"
-#include "json_builder.h"
 
 //#define JSON_TEST1
 /*
@@ -15,20 +14,19 @@
 using namespace std;
 using namespace transport;
 using namespace json;
+using namespace map_renderer;
+using namespace json_reader;
+using namespace request_handler;
 
 int main()
 {
-    // automatic test 11 sprint
-
-    //TransportCatalogue tc;
-    //fstream ist("s10_final_opentest_1.json");
-    //fstream out("output.txt");
-    //transport::reader::json::InputStatReader{}(ist, out, tc);
 
     // manual test 11 sprint
-
-    //TransportCatalogue tc;
-    //transport::reader::json::InputStatReader{}(cin, cout, tc);
+    TransportCatalogue tc;
+    MapRenderer mr;
+    RequestHandler rh(tc, mr);
+    JsonReader jr(rh);
+    jr.InputStatReader(std::cin, std::cout);
 
     // json test
 #ifdef JSON_TEST1
@@ -64,27 +62,27 @@ int main()
     );
     cout << endl;
 
-#endif // Json Test1
+#endif // JSON_TEST1
 
 #ifdef JSON_TEST2
     json::Builder{}.StartDict().Key("1"s).Key(""s);  // правило 1
-#endif // JsonTest2
+#endif // JSON_TEST2
 
 #ifdef JSON_TEST3
     json::Builder{}.StartDict().Key("1"s).Value(1).Value(1);  // правило 2
-#endif // JsonTest3
+#endif // JSON_TEST3
 
 #ifdef JSON_TEST4
     json::Builder{}.StartDict().Build();  // правило 3
-#endif // JsonTest4
+#endif // JSON_TEST4
 
 #ifdef JSON_TEST5
     json::Builder{}.StartArray().Value(1).Value(2).EndDict();  // правило 5
-#endif // JsonTest5
+#endif // JSON_TEST5
 
 #ifdef JSON_TEST6
     json::Builder{}.StartArray().EndDict();  // правило 4
     json::Builder{}.StartArray().Key("1"s);  // правило 4
-#endif // JsonTest6
+#endif // JSON_TEST6
 
 }

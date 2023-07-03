@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-namespace transport::geo {
+namespace geo {
+
     struct Coordinates {
         double latitude;
         double longitude;
