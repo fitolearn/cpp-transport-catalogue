@@ -12,6 +12,7 @@
 using namespace domain;
 using namespace std::literals;
 using namespace std;
+using namespace json;
 
 namespace json_reader {
 
@@ -20,7 +21,7 @@ namespace json_reader {
     {}
 
     void JsonReader::InputStatReader(std::istream& is, std::ostream& os) {
-        const json::Document doc = json::Load(is);
+        const Document doc = json::Load(is);
         const Node& node = doc.GetRoot();
         const Dict& dict = node.AsMap();
         if (dict.count("routing_settings"s)) {
@@ -77,12 +78,8 @@ namespace json_reader {
                 for (size_t j = i + 1; j < bus->route.size(); ++j) {
                     const string_view stop_name_to = *bus->route[j]->name;
                     int actual = *rh_.GetDistanceBetweenTwoStops(prev_stop_name, stop_name_to);
-                    rh_.AddBusEdgeToRouter(
-                            stop_name_from,
-                            stop_name_to,
-                            bus_name,
-                            j - i,
-                            prev_actual + actual
+                    rh_.AddBusEdgeToRouter(stop_name_from,stop_name_to,bus_name,
+                                           j - i, prev_actual + actual
                     );
                     prev_stop_name = stop_name_to;
                     prev_actual += actual;
@@ -167,18 +164,14 @@ namespace json_reader {
         } else if (node.IsArray()) {
             const Array& arr = node.AsArray();
             if (arr.size() == 3) {
-                return svg::Rgb {
-                            static_cast<uint8_t>(arr[0].AsInt()),
-                            static_cast<uint8_t>(arr[1].AsInt()),
-                            static_cast<uint8_t>(arr[2].AsInt())
-                };
+                return svg::Rgb {static_cast<uint8_t>(arr[0].AsInt()),
+                                 static_cast<uint8_t>(arr[1].AsInt()),
+                                 static_cast<uint8_t>(arr[2].AsInt())};
             } else {
-                return svg::Rgba {
-                            static_cast<uint8_t>(arr[0].AsInt()),
-                            static_cast<uint8_t>(arr[1].AsInt()),
-                            static_cast<uint8_t>(arr[2].AsInt()),
-                            GetDoubleFromNode(arr[3])
-                     };
+                return svg::Rgba {static_cast<uint8_t>(arr[0].AsInt()),
+                                  static_cast<uint8_t>(arr[1].AsInt()),
+                                  static_cast<uint8_t>(arr[2].AsInt()),
+                                  arr[3].AsDouble()};
             }
         } return {};
     }
@@ -201,10 +194,7 @@ namespace json_reader {
                         req.at("id"s).AsInt()
                 );
             } else if (type == "Route"s) {
-                node = OutRouteReq(
-                        req.at("from"s).AsString(),
-                        req.at("to"s).AsString(),
-                        req.at("id"s).AsInt()
+                node = OutRouteReq(req.at("from"s).AsString(),req.at("to"s).AsString(),req.at("id"s).AsInt()
                 );
             } else {
                 node = OutMapReq(req.at("id"s).AsInt());

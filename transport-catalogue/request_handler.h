@@ -28,7 +28,6 @@ namespace request_handler {
         static std::tuple<std::string, std::string> SplitIntoLengthStop(const std::string& str) ;
         static std::tuple<std::vector<std::string>, SeparatorType> SplitIntoWordsBySeparator(std::string_view str) ;
         std::tuple<std::vector<std::string_view>, int> WordsToRoute(const std::vector<std::string>& words, SeparatorType separator) const;
-
     public:
         RequestHandler(transport::TransportCatalogue& db, map_renderer::MapRenderer& mr);
         void BuildRouter();
@@ -42,18 +41,14 @@ namespace request_handler {
         void SetRoutingSettings(double bus_wait_time, double bus_velocity);
         void AddStopToRouter(std::string_view name);
         void AddWaitEdgeToRouter(std::string_view stop_name);
-        void AddBusEdgeToRouter(
-                std::string_view stop_from,
-                std::string_view stop_to,
-                std::string_view bus_name,
-                int span_count,
-                int dist
+        void AddBusEdgeToRouter(std::string_view stop_from,std::string_view stop_to,
+                                std::string_view bus_name,int span_count,int dist
         );
         domain::BusPtr SearchBusByName(std::string_view name) const;
         domain::StopPtr SearchStopByName(std::string_view name) const;
-        std::vector<domain::BusPtr>  GetBuses() const;
+        std::vector<domain::BusPtr> GetBuses() const;
         std::vector<domain::StopPtr> GetStops() const;
-        std::optional<domain::BusStat>  GetBusStatByName(std::string_view bus_name)   const;
+        std::optional<domain::BusStat> GetBusStatByName(std::string_view bus_name) const;
         std::optional<domain::StopStat> GetStopStatByName(std::string_view stop_name) const;
         const std::unordered_set<domain::BusPtr>* GetBusesByStop(std::string_view stop_name) const;
         std::tuple<double, int> ComputeRouteLengths(const std::vector<std::string_view>& routes) const;
