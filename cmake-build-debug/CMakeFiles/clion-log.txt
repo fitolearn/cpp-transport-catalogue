@@ -1,60 +1,28 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc@12/12.2.0/bin/g++-12 -S /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue -B /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc@12/12.2.0/bin/g++-12 -G Ninja -S /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue -B /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug
+-- The CXX compiler identification is GNU 12.2.0
+-- Checking whether CXX compiler has -isysroot
+-- Checking whether CXX compiler has -isysroot - yes
+-- Checking whether CXX compiler supports OSX deployment target flag
+-- Checking whether CXX compiler supports OSX deployment target flag - yes
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/homebrew/Cellar/gcc@12/12.2.0/bin/g++-12 - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
 CMake Warning at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.23/Modules/FindProtobuf.cmake:524 (message):
-  Protobuf compiler version doesn't match library version 3.21.12
+  Protobuf compiler version 3.21.12 doesn't match library version 4.23.4
 Call Stack (most recent call first):
-  CMakeLists.txt:14 (find_package)
+  CMakeLists.txt:13 (find_package)
 
 
+-- Found Protobuf: /opt/homebrew/lib/libprotobuf.dylib (found version "4.23.4") 
+-- Found Threads: TRUE  
 -- Configuring done
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
-CMake Error in CMakeLists.txt:
-  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
-  configuration "Debug".
-
-
 -- Generating done
-CMake Generate step failed.  Build files cannot be regenerated correctly.
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+
+
+-- Build files have been written to: /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug

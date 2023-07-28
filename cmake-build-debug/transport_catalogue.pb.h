@@ -31,7 +31,6 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "graph.pb.h"
-#include "svg.pb.h"
 #include "map_renderer.pb.h"
 #include "transport_router.pb.h"
 // @@protoc_insertion_point(includes)

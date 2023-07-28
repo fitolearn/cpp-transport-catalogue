@@ -62,25 +62,24 @@ static const ::_pb::Message* const file_default_instances[] = {
 
 const char descriptor_table_protodef_transport_5fcatalogue_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\031transport_catalogue.proto\022\014tc_serializ"
-  "e\032\013graph.proto\032\tsvg.proto\032\022map_renderer."
-  "proto\032\026transport_router.proto\"\272\001\n\022Transp"
-  "ortCatalogue\0225\n\017render_settings\030\001 \001(\0132\034."
-  "tc_serialize.RenderSettings\0221\n\rbase_sett"
-  "ings\030\002 \001(\0132\032.tc_serialize.BaseSettings\022:"
-  "\n\017router_settings\030\003 \001(\0132!.tc_serialize.G"
-  "raphRouterSettingsb\006proto3"
+  "e\032\013graph.proto\032\022map_renderer.proto\032\026tran"
+  "sport_router.proto\"\272\001\n\022TransportCatalogu"
+  "e\0225\n\017render_settings\030\001 \001(\0132\034.tc_serializ"
+  "e.RenderSettings\0221\n\rbase_settings\030\002 \001(\0132"
+  "\032.tc_serialize.BaseSettings\022:\n\017router_se"
+  "ttings\030\003 \001(\0132!.tc_serialize.GraphRouterS"
+  "ettingsb\006proto3"
   ;
-static const ::_pbi::DescriptorTable* const descriptor_table_transport_5fcatalogue_2eproto_deps[4] = {
+static const ::_pbi::DescriptorTable* const descriptor_table_transport_5fcatalogue_2eproto_deps[3] = {
   &::descriptor_table_graph_2eproto,
   &::descriptor_table_map_5frenderer_2eproto,
-  &::descriptor_table_svg_2eproto,
   &::descriptor_table_transport_5frouter_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_transport_5fcatalogue_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_transport_5fcatalogue_2eproto = {
-    false, false, 306, descriptor_table_protodef_transport_5fcatalogue_2eproto,
+    false, false, 295, descriptor_table_protodef_transport_5fcatalogue_2eproto,
     "transport_catalogue.proto",
-    &descriptor_table_transport_5fcatalogue_2eproto_once, descriptor_table_transport_5fcatalogue_2eproto_deps, 4, 1,
+    &descriptor_table_transport_5fcatalogue_2eproto_once, descriptor_table_transport_5fcatalogue_2eproto_deps, 3, 1,
     schemas, file_default_instances, TableStruct_transport_5fcatalogue_2eproto::offsets,
     file_level_metadata_transport_5fcatalogue_2eproto, file_level_enum_descriptors_transport_5fcatalogue_2eproto,
     file_level_service_descriptors_transport_5fcatalogue_2eproto,

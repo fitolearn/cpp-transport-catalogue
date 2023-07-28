@@ -5,9 +5,8 @@ project(cpp_transport_catalogue CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 include_directories(transport-catalogue)
-set(CMAKE_PREFIX_PATH /Users/fitopisya/Documents/protobuf)
-set(Protobuf_PROTOC_EXECUTABLE /usr/bin/protoc)
-set(-DBUILD_DEPS=ON)
+set(Protobuf_PROTOC_EXECUTABLE /Users/fitopisya/Documents/protobuf/bin/protoc)
+
 # Эта команда найдёт собранный нами пакет Protobuf.
 # REQUIRED означает, что библиотека обязательна.
 # Путь для поиска укажем в параметрах команды cmake.
