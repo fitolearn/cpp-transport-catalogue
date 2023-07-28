@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "json_reader.h"
-
+#include "transport_catalogue.h"
 //#define JSON_TEST1
 /*
 #define JSON_TEST2
@@ -14,21 +14,53 @@
 using namespace std;
 using namespace transport;
 using namespace json;
-using namespace map_renderer;
 using namespace json_reader;
-using namespace request_handler;
+using namespace std::literals;
 
-int main()
-{
 
-    // manual test 11 sprint
+void PrintUsage(std::ostream& stream = std::cerr) {
+    stream << "Usage: transport_catalogue [make_base|process_requests]\n"sv;
+}
+
+int main(int argc, char* argv[]) {
     TransportCatalogue tc;
-    MapRenderer mr;
-    RequestHandler rh(tc, mr);
-    JsonReader jr(rh);
-    jr.InputStatReader(std::cin, std::cout);
+    JsonReader jr(tc);
+    //jr.InputStatReader(std::cin);
+    //jr.OutputStatReader(std::cout);
 
-    // json test
+    if (argc != 2) {
+        PrintUsage();
+        return 1;
+    }
+    const std::string_view mode(argv[1]);
+
+    if (mode == "make_base"sv) {
+        jr.InputStatReader(std::cin);
+        SerializationSettings settings = jr.GetSerializationSettings();
+        std::ofstream out(settings.file_name, std::ios::binary | std::ios::out);
+        tc_serialize::TransportCatalogue ser_tc;
+
+        tc.SaveToSerializeTransportCat(ser_tc);
+        jr.SaveToReader(ser_tc);
+        ser_tc.SerializeToOstream(&out);
+
+    } else if (mode == "process_requests"sv) {
+        jr.ReadJson(std::cin);
+        tc_serialize::TransportCatalogue ser_tc;
+        SerializationSettings settings = jr.GetSerializationSettings();
+        std::ifstream input(settings.file_name, std::ios::binary | std::ios::in);
+        ser_tc.ParseFromIstream(&input);
+
+        tc.RestoreFromSerializedTransportCat(ser_tc);
+        jr.RestoreFrom(ser_tc);
+        jr.OutputStatReader(std::cout);
+    } else {
+        PrintUsage();
+        return 1;
+    }
+}
+
+/*    // json test
 #ifdef JSON_TEST1
     json::Print(
             json::Document{
@@ -86,3 +118,4 @@ int main()
 #endif // JSON_TEST6
 
 }
+*/

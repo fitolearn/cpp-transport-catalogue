@@ -5,38 +5,6 @@
 		{
 			"compiler" : 
 			{
-				"id" : "AppleClang",
-				"implicit" : 
-				{
-					"includeDirectories" : 
-					[
-						"/Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/include",
-						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/usr/include",
-						"/Library/Developer/CommandLineTools/usr/include"
-					],
-					"linkDirectories" : 
-					[
-						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/usr/lib"
-					],
-					"linkFrameworkDirectories" : 
-					[
-						"/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/System/Library/Frameworks"
-					],
-					"linkLibraries" : []
-				},
-				"path" : "/usr/bin/gcc",
-				"version" : "14.0.0.14000029"
-			},
-			"language" : "C",
-			"sourceFileExtensions" : 
-			[
-				"c",
-				"m"
-			]
-		},
-		{
-			"compiler" : 
-			{
 				"id" : "GNU",
 				"implicit" : 
 				{
@@ -81,6 +49,7 @@
 				"cc",
 				"cpp",
 				"cxx",
+				"m",
 				"mm",
 				"mpp",
 				"CPP",

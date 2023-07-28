@@ -1,4 +1,60 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc@12/12.2.0/bin/g++-12 -G Ninja -S /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue -B /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc@12/12.2.0/bin/g++-12 -S /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue -B /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug
+CMake Warning at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.23/Modules/FindProtobuf.cmake:524 (message):
+  Protobuf compiler version doesn't match library version 3.21.12
+Call Stack (most recent call first):
+  CMakeLists.txt:14 (find_package)
+
+
 -- Configuring done
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
+CMake Error in CMakeLists.txt:
+  IMPORTED_LOCATION not set for imported target "protobuf::protoc"
+  configuration "Debug".
+
+
 -- Generating done
--- Build files have been written to: /Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug
+CMake Generate step failed.  Build files cannot be regenerated correctly.

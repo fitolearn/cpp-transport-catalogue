@@ -12,14 +12,12 @@ namespace json {
     class BaseContext {
     public:
         BaseContext(Builder& builder);
-
         DictItemContext StartDict();
         ArrayItemContext StartArray();
         Builder& EndDict();
         Builder& EndArray();
         KeyItemContext Key(std::string key);
         Builder& Value(Node value);
-
     private:
         Builder& builder_;
     };
@@ -29,12 +27,8 @@ namespace json {
         KeyItemContext(Builder& builder);
         KeyItemContext Value(Node value);
 
-        Builder& EndDict() = delete;
         Builder& EndArray() = delete;
-        Builder& Key(std::string key) = delete;
         DictItemContext StartDict() = delete;
-        ArrayItemContext StartArray() = delete;
-        //Builder& Value(Node value) = delete;
     };
 
     class DictItemContext : public BaseContext{

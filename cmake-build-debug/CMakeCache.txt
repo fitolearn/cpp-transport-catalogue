@@ -24,6 +24,9 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 // MinSizeRel ...
 CMAKE_BUILD_TYPE:STRING=Debug
 
+//Enable/Disable color output during build.
+CMAKE_COLOR_MAKEFILE:BOOL=ON
+
 //No help, variable specified on the command line.
 CMAKE_CXX_COMPILER:UNINITIALIZED=/opt/homebrew/Cellar/gcc@12/12.2.0/bin/g++-12
 
@@ -52,21 +55,6 @@ CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //No help, variable specified on the command line.
 CMAKE_C_COMPILER:UNINITIALIZED=/usr/bin/gcc
-
-//Flags used by the C compiler during all build types.
-CMAKE_C_FLAGS:STRING=
-
-//Flags used by the C compiler during DEBUG builds.
-CMAKE_C_FLAGS_DEBUG:STRING=-g
-
-//Flags used by the C compiler during MINSIZEREL builds.
-CMAKE_C_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
-
-//Flags used by the C compiler during RELEASE builds.
-CMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
-
-//Flags used by the C compiler during RELWITHDEBINFO builds.
-CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //Path to a program.
 CMAKE_DLLTOOL:FILEPATH=CMAKE_DLLTOOL-NOTFOUND
@@ -98,8 +86,8 @@ CMAKE_INSTALL_PREFIX:PATH=/usr/local
 //Path to a program.
 CMAKE_LINKER:FILEPATH=/usr/bin/ld
 
-//No help, variable specified on the command line.
-CMAKE_MAKE_PROGRAM:UNINITIALIZED=/Applications/CLion.app/Contents/bin/ninja/mac/ninja
+//Path to a program.
+CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/make
 
 //Flags used by the linker during the creation of modules during
 // all build types.
@@ -212,6 +200,27 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Path to a file.
+Protobuf_INCLUDE_DIR:PATH=/Users/fitopisya/Documents/protobuf/include
+
+//Path to a library.
+Protobuf_LIBRARY_DEBUG:FILEPATH=/Users/fitopisya/Documents/protobuf/lib/libprotobufd.a
+
+//Path to a library.
+Protobuf_LIBRARY_RELEASE:FILEPATH=/opt/homebrew/lib/libprotobuf.dylib
+
+//Path to a library.
+Protobuf_LITE_LIBRARY_DEBUG:FILEPATH=/Users/fitopisya/Documents/protobuf/lib/libprotobuf-lited.a
+
+//Path to a library.
+Protobuf_LITE_LIBRARY_RELEASE:FILEPATH=/opt/homebrew/lib/libprotobuf-lite.dylib
+
+//Path to a library.
+Protobuf_PROTOC_LIBRARY_DEBUG:FILEPATH=/Users/fitopisya/Documents/protobuf/lib/libprotocd.a
+
+//Path to a library.
+Protobuf_PROTOC_LIBRARY_RELEASE:FILEPATH=/opt/homebrew/lib/libprotoc.dylib
+
 //Value Computed by CMake
 cpp_transport_catalogue_BINARY_DIR:STATIC=/Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue/cmake-build-debug
 
@@ -238,6 +247,8 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=23
 //Patch version of cmake used to create the current loaded cache
 CMAKE_CACHE_PATCH_VERSION:INTERNAL=2
+//ADVANCED property for variable: CMAKE_COLOR_MAKEFILE
+CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 //Path to CMake executable.
 CMAKE_COMMAND:INTERNAL=/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake
 //Path to cpack program executable.
@@ -260,18 +271,6 @@ CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_RELWITHDEBINFO
 CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_COMPILER
-CMAKE_C_COMPILER-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_FLAGS
-CMAKE_C_FLAGS-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_FLAGS_DEBUG
-CMAKE_C_FLAGS_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_FLAGS_MINSIZEREL
-CMAKE_C_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_FLAGS_RELEASE
-CMAKE_C_FLAGS_RELEASE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_FLAGS_RELWITHDEBINFO
-CMAKE_C_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_DLLTOOL
 CMAKE_DLLTOOL-ADVANCED:INTERNAL=1
 //Executable file format
@@ -291,13 +290,17 @@ CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
 //Name of generator.
-CMAKE_GENERATOR:INTERNAL=Ninja
+CMAKE_GENERATOR:INTERNAL=Unix Makefiles
 //Generator instance identifier.
 CMAKE_GENERATOR_INSTANCE:INTERNAL=
 //Name of generator platform.
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//Test CMAKE_HAVE_LIBC_PTHREAD
+CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
+//Have include pthread.h
+CMAKE_HAVE_PTHREAD_H:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/Users/fitopisya/Documents/clion_projects/cpp-transport-catalogue
@@ -305,6 +308,8 @@ CMAKE_HOME_DIRECTORY:INTERNAL=/Users/fitopisya/Documents/clion_projects/cpp-tran
 CMAKE_INSTALL_NAME_TOOL-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_MAKE_PROGRAM
+CMAKE_MAKE_PROGRAM-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS
 CMAKE_MODULE_LINKER_FLAGS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_DEBUG
@@ -361,4 +366,22 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding Protobuf
+FIND_PACKAGE_MESSAGE_DETAILS_Protobuf:INTERNAL=[optimized;/opt/homebrew/lib/libprotobuf.dylib;debug;/Users/fitopisya/Documents/protobuf/lib/libprotobufd.a][/Users/fitopisya/Documents/protobuf/include][v3.21.12()]
+//Details about finding Threads
+FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
+//ADVANCED property for variable: Protobuf_INCLUDE_DIR
+Protobuf_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Protobuf_LIBRARY_DEBUG
+Protobuf_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Protobuf_LIBRARY_RELEASE
+Protobuf_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Protobuf_LITE_LIBRARY_DEBUG
+Protobuf_LITE_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Protobuf_LITE_LIBRARY_RELEASE
+Protobuf_LITE_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Protobuf_PROTOC_LIBRARY_DEBUG
+Protobuf_PROTOC_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Protobuf_PROTOC_LIBRARY_RELEASE
+Protobuf_PROTOC_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 

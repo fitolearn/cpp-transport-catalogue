@@ -1,30 +1,14 @@
 #include <utility>
 #include "domain.h"
-namespace domain {
+using namespace std::literals;
 
-    Stop::Stop(std::string name, double lat, double lng)
-            : name(std::make_shared<std::string>(std::move(name)))
-            , latitude(lat)
-            , longitude(lng)
-    {}
+namespace transport {
 
-    Bus::Bus(std::string name, std::vector<StopPtr> route, int unique, int actual, double geo, StopPtr last_stop)
-            : name(std::make_shared<std::string>(std::move(name)))
-            , route(std::vector<StopPtr>(std::move(route)))
-            , unique_stops(unique)
-            , route_actual_length(actual)
-            , route_geographic_length(geo)
-            , last_stop_name(std::move(last_stop))
-    {}
-
-    double Stop::GetDistanceTo(const StopPtr& stop_to) const {
-        return geo::ComputeDistance(
-                { latitude, longitude },
-                { stop_to.get()->latitude, stop_to.get()->longitude }
-        );
+    std::ostream& operator<<(std::ostream& os, const BusInfo& bus_info) {
+        size_t length = bus_info.route_length;
+        os << "Bus "s << bus_info.bus_name << ": "s << bus_info.stops_number << " stops on route, "s
+           << bus_info.unique_stops_counter << " unique stops, "s << std::setprecision(6) << length << " route length, "s
+           << std::setprecision(6) << bus_info.curvature << " curvature"s << std::endl;
+        return os;
     }
-
-    /*double ComputeDistance(const Stop* lhs, const Stop* rhs) {
-        return geo::ComputeDistance(lhs->coordinates_, rhs->coordinates_);
-    }*/
-}
+} // namespace transport_catalogue

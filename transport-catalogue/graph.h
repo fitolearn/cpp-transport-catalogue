@@ -34,9 +34,9 @@ namespace graph {
         const Edge<Weight>& GetEdge(EdgeId edge_id) const;
         IncidentEdgesRange GetIncidentEdges(VertexId vertex) const;
 
-    private:
-        std::vector<Edge<Weight>> edges_;
+    protected:
         std::vector<IncidenceList> incidence_lists_;
+        std::vector<Edge<Weight>> edges_;
     };
 
     template <typename Weight>

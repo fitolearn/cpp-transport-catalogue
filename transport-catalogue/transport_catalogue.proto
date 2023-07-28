@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package tc_serialize;
+
+import "graph.proto";
+import "map_renderer.proto";
+import "transport_router.proto";
+
+message TransportCatalogue {
+  RenderSettings render_settings = 1;
+  BaseSettings base_settings = 2;
+  GraphRouterSettings router_settings = 3;
+}

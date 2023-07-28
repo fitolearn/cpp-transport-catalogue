@@ -1,51 +1,50 @@
 #pragma once
 #include <string>
-#include <string_view>
 #include <vector>
-#include <unordered_set>
-#include <memory>
-#include <optional>
-#include <list>
+#include <set>
+#include <iomanip>
 #include "geo.h"
 
-namespace domain {
-
-    struct Bus;
-    struct Stop;
-    using BusPtr = std::shared_ptr<Bus>;
-    using StopPtr = std::shared_ptr<Stop>;
+namespace transport {
 
     struct Stop {
-        Stop(std::string name, double lat, double lng);
-        [[nodiscard]] double GetDistanceTo(const StopPtr& stop_to) const;
-        std::shared_ptr<std::string> name;
-        double latitude = 0.;
-        double longitude = 0.;
+        uint32_t id = 0;
+        std::string stop_name;
+        geo::Coordinates coordinates;
     };
 
-    struct Bus {
-        Bus(std::string name, std::vector<StopPtr> route, int unique, int actual, double geo, StopPtr last_stop = nullptr);
-        Bus& operator=(const Bus& bus) = default;
-        std::shared_ptr<std::string> name;
-        std::vector<StopPtr> route;
-        int unique_stops = 0;
-        int route_actual_length = 0;
-        double route_geographic_length = 0;
-        StopPtr last_stop_name;
+    struct StopDistanceData {
+        std::string other_stop_name;
+        size_t distance = 0;
     };
 
-    struct BusStat {
-        std::string_view name;
-        int stops_on_route = 0;
-        int unique_stops  = 0;
-        int routh_actual_length = 0;
-        double curvature = 0.;
+    struct StopWithDistances : Stop {
+        std::vector<StopDistanceData> distances;
     };
 
-    struct StopStat {
-        std::string_view name;
-        const std::unordered_set<BusPtr>* passing_buses;
+    enum RouteType {
+        NOT_SET,
+        CIRCLE_ROUTE,
+        RETURN_ROUTE
     };
 
-    //double ComputeDistance(const Stop*, const Stop*);
-}
+    struct BusRoute {
+        std::string bus_name;
+        RouteType type;
+        std::vector<const Stop *> route_stops;
+    };
+
+    const Stop EMPTY_STOP{};
+    const BusRoute EMPTY_BUS_ROUTE{};
+    const std::set<std::string_view> EMPTY_BUS_ROUTE_SET{};
+
+    struct BusInfo {
+        std::string_view bus_name;
+        RouteType route_type;
+        size_t stops_number;
+        size_t unique_stops_counter;
+        size_t route_length;
+        double curvature;
+    };
+    std::ostream &operator<<(std::ostream &os, const BusInfo &bus_info);
+} // namespace transport_catalogue

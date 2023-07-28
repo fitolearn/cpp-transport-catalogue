@@ -1,45 +1,65 @@
 #pragma once
-
-#include <iostream>
-#include <tuple>
-#include <string_view>
+#include <sstream>
 #include <vector>
-#include <string>
-#include <optional>
 #include "json.h"
 #include "transport_catalogue.h"
-#include "request_handler.h"
+#include "transport_catalogue.pb.h"
 #include "map_renderer.h"
+#include "domain.h"
+#include "router.h"
+#include "transport_router.h"
+#include "serialization.h"
 
+using namespace std::literals;
 namespace json_reader {
 
     using ::json::Node;
     using ::json::Document;
     using ::json::Array;
     using ::json::Dict;
-    using BusWaitTime = int;
-    using BusVelocity = double;
+
+    struct BusRouteJson {
+        std::string bus_name;
+        transport::RouteType type;
+        std::vector<std::string> route_stops;
+    };
+
+    using BaseRequest = std::variant<std::monostate, transport::StopWithDistances, BusRouteJson>;
 
     class JsonReader {
     public:
-        explicit JsonReader(request_handler::RequestHandler& r_h);
-        void InputStatReader(std::istream& is, std::ostream& os);
+        explicit JsonReader(transport::TransportCatalogue &tc) : transport_catalogue_(tc) {}
+        size_t ReadJson(std::istream &input);
+        size_t InputStatReader(std::istream &input);
+        size_t OutputStatReader(std::ostream &output);
+        [[nodiscard]] RendererSettings GetRendererSetting() const;
+        RoutingSettings GetRoutingSettings() const;
+        SerializationSettings GetSerializationSettings() const;
+        void SaveToReader(tc_serialize::TransportCatalogue &t_cat) const;
+        bool RestoreFrom(tc_serialize::TransportCatalogue &t_cat);
+        static inline json::Node GetErrorNode(int id) ;
     private:
-        request_handler::RequestHandler& rh_;
-        void FillTransportCatalogue(const Dict& dict);
-        void FillGraphRouter();
-        void FillBus(const Dict& bus);
-        void AnswerStatRequests(const json::Dict& dict, std::ostream& out) const;
-        const Dict& FillStop(const Dict& stop_req);
-        static std::tuple<BusWaitTime, BusVelocity> ReadRoutingSettings(const json::Dict& dict);
-        static map_renderer::RenderingSettings ReadRenderingSettings(const json::Dict& dict);
-        [[nodiscard]] static double GetDoubleFromNode(const json::Node& node) ;
-        [[nodiscard]] static std::vector<svg::Color> GetColorsFromArray(const json::Array& arr) ;
-        [[nodiscard]] static svg::Color GetColor(const json::Node& node) ;
-        [[nodiscard]] static Node OutStopStat(std::optional<domain::StopStat> stop_stat, int id) ;
-        [[nodiscard]] static Node OutBusStat(std::optional<domain::BusStat> bus_stat, int id) ;
-        [[nodiscard]] Node OutRouteReq(std::string_view from, std::string_view to, int id) const;
-        [[nodiscard]] Node OutMapReq(int id) const;
-        [[nodiscard]] std::tuple<std::vector<std::string_view>, int, domain::StopPtr> WordsToRoute(const json::Array& words, bool circular) const;
+        mutable std::optional<RoutingSettings> routing_settings_;
+        mutable std::optional<RendererSettings> renderer_settings_;
+        transport::TransportCatalogue &transport_catalogue_;
+        std::vector<json::Document> root_;
+        std::vector<transport::StopWithDistances> raw_stops_;
+        std::vector<BusRouteJson> raw_buses_;
+        std::unique_ptr<TransportCatalogueRouterGraph> graph_ptr_;
+        json::Node ProcessOneUserRequestNode(const json::Node &user_request);
+        json::Node GenerateMapNode(int id) const;
+        json::Node GenerateBusNode(int id, std::string &name) const;
+        json::Node GenerateStopNode(int id, std::string &name) const;
+        json::Node GenerateRouteNode(int id, std::string_view from, std::string_view to) const;
+        json::Dict GetDictForRenderSettings() const;
+        size_t ParseJsonToRawData();
+        static BaseRequest ParseDataNode(const json::Node &node);
+        bool FillTransportCatalogue();
+        static std::optional<geo::Coordinates> ParseCoordinates(const json::Dict &dict);
+        static BaseRequest ParseDataStop(const json::Dict &dict);
+        static BaseRequest ParseDataBus(const json::Dict &dict);
+        static svg::Color GetColor(const Node& node);
+        static void ThrowParsError();
+        static double CheckSettingParam(json::Dict& settings, std::string&& str);
     };
-}
+} // namespace json_reader

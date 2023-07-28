@@ -1,89 +1,95 @@
 #pragma once
-#include <string>
-#include <optional>
-#include <utility>
-#include <unordered_map>
-#include <string_view>
-#include <vector>
-#include <functional>
-#include "graph.h"
+#include "transport_catalogue.h"
+#include "transport_catalogue.pb.h"
 #include "router.h"
+#include <memory>
 
-namespace transport {
-
-    static constexpr double TO_MINUTES = (3.6 / 60.0);
-// ---------------------------------------------------------------- Structs
-    struct RouteItemBus {
-        std::string_view bus_name;
-        int span_count;
-        double time;
-    };
-
-    /*
-     items — список элементов маршрута, каждый из которых описывает непрерывную активность пассажира, требующую временных затрат. А именно элементы маршрута бывают двух типов.
-Wait — подождать нужное количество минут (в нашем случае всегда bus_wait_time) на указанной остановке:
-     Bus — проехать span_count остановок (перегонов между остановками) на автобусе bus, потратив указанное количество минут:
-     */
-
-    struct RouteItemWait {
-        std::string_view stop_name;
-        double time;
-    };
-
-    struct RouteItem {
-        std::optional<RouteItemWait> wait_item;
-        std::optional<RouteItemBus> bus_item;
-    };
-
-    struct RouteInfo {
-        double total_time = 0.;
-        std::vector<RouteItem> items;
-    };
-
-    struct EdgeInfo {
-        graph::Edge<double> edge;
-        std::string_view name;
-        int span_count = -1;
-        double time = 0.;
-    };
-// ----------------------------------------------------------------
-
-    class Router {
-    private:
-        using Graph = graph::DirectedWeightedGraph<double>;
-        using GraphRouter = graph::Router<double>;
-
-        struct Settings {
-            double wait_time = 6;
-            double velocity  = 40.;
-        };
-
-        /*"routing_settings": {
+/*"routing_settings": {
             "bus_wait_time": 6,
             bus_velocity": 40
             } */
 
-        struct Vertexes {
-            size_t start_wait;
-            size_t end_wait;
-        };
+struct RoutingSettings {
+    int bus_wait_time;
+    double bus_velocity;
+};
 
-        Settings settings_;
-        std::optional<Graph> graph_ = std::nullopt;
-        std::optional<GraphRouter> router_ = std::nullopt;
-        std::unordered_map<std::string_view, Vertexes, std::hash<std::string_view>> stop_to_vertex_id_;
-        std::vector<EdgeInfo> edges_;
-        std::vector<RouteItem> MakeItemsByEdgeIds(const std::vector<graph::EdgeId>& edge_ids) const;
-    public:
-        Router() = default;
-        explicit Router(size_t graph_size);
-        void BuildGraph();
-        void BuildRouter();
-        void AddEdgesToGraph();
-        void SetSettings(double bus_wait_time, double bus_velocity);
-        void AddWaitEdge(std::string_view stop_name);
-        void AddBusEdge(std::string_view stop_from, std::string_view stop_to, std::string_view bus_name, int span_count, int dist);
-        void AddStop(std::string_view stop_name);
-        std::optional<RouteInfo> GetRouteInfo(std::string_view from, std::string_view to) const;
+struct TwoStopsLink {
+    std::string_view bus_name = {};
+    graph::VertexId stop_from = {};
+    graph::VertexId stop_to = {};
+    size_t number_of_stops = {};
+
+    explicit TwoStopsLink(std::string_view bus, graph::VertexId from, graph::VertexId to, size_t num) :
+            bus_name(bus), stop_from(from), stop_to(to), number_of_stops(num) {
+    }
+    TwoStopsLink() = default;
+
+    size_t operator()(const TwoStopsLink& sor) const {
+        return hasher_num_(number_of_stops) + 43 * hasher_num_(sor.stop_from) +
+               43 * 43 * hasher_num_(sor.stop_to) + 43 * 43 * 43 * hasher_(bus_name);
+    }
+    bool operator()(const TwoStopsLink& lhs, const TwoStopsLink& rhs) const {
+        return lhs.bus_name == rhs.bus_name && lhs.stop_from == rhs.stop_from
+               && lhs.stop_to == rhs.stop_to && lhs.number_of_stops == rhs.number_of_stops;
+    }
+private:
+    std::hash<size_t> hasher_num_;
+    std::hash<std::string_view> hasher_;
+};
+
+class TransportCatalogueRouterGraph : public graph::DirectedWeightedGraph<double> {
+public:
+    struct StopOnRoute {
+        size_t stop_number;
+        std::string_view stop_name;
+        std::string_view bus_name;
+
+        explicit StopOnRoute(size_t num, std::string_view stop, std::string_view bus) : stop_number(num), stop_name(stop), bus_name(bus) {
+        }
+
+        StopOnRoute() = default;
+        size_t operator()(const StopOnRoute& sor) const {
+            return hasher_num_(stop_number) + 43 * hasher_(sor.stop_name) + 43 * 43 * hasher_(sor.bus_name);
+        }
+        bool operator()(const StopOnRoute& lhs, const StopOnRoute& rhs) const {
+            return lhs.stop_name == rhs.stop_name && lhs.bus_name == rhs.bus_name && lhs.stop_number == rhs.stop_number;
+        }
+    private:
+        std::hash<size_t> hasher_num_;
+        std::hash<std::string_view> hasher_;
     };
-}
+    TransportCatalogueRouterGraph(const transport::TransportCatalogue& tc, RoutingSettings rs);
+    TransportCatalogueRouterGraph(const transport::TransportCatalogue& tc, RoutingSettings rs, const tc_serialize::TransportCatalogue& tc_);
+    ~TransportCatalogueRouterGraph() = default;
+    bool SaveTo(tc_serialize::TransportCatalogue& tc_to) const;
+    bool RestoreFrom(const tc_serialize::TransportCatalogue& tc_from);
+    std::optional<graph::Router<double>::RouteInfo> BuildRoute(std::string_view from, std::string_view to) const;
+    const StopOnRoute& GetStopById(graph::VertexId id) const;
+    const TwoStopsLink& GetLinkById(graph::EdgeId id) const;
+    double GetBusWaitingTime() const;
+private:
+    const transport::TransportCatalogue& tc_;
+    RoutingSettings rs_;
+    graph::EdgeId edge_count_ = 0;
+    std::unique_ptr<graph::Router<double>> router_ptr_;
+    std::unordered_map<StopOnRoute, graph::VertexId , StopOnRoute, StopOnRoute> stop_to_vertex_;
+    std::unordered_map<size_t , StopOnRoute> vertex_to_stop_;
+    graph::VertexId vertex_id_count_ = 0;
+    std::unordered_map<TwoStopsLink, graph::EdgeId, TwoStopsLink, TwoStopsLink> stoplink_to_edge_;
+    std::unordered_map<graph::EdgeId, TwoStopsLink> edge_to_stoplink_;
+    graph::VertexId RegisterStop(const StopOnRoute& stop);
+    graph::EdgeId StoreLink(const TwoStopsLink& link, graph::EdgeId edge);
+    graph::VertexId GetStopVertexId(std::string_view stop_name) const;
+    TwoStopsLink DeserializeTwoStopsLink(const tc_serialize::TwoStopsLinkPB& link) const;
+    tc_serialize::StopOnRoutePB SerializeStopOnRoute(const StopOnRoute& stop, graph::VertexId vertexId) const;
+    StopOnRoute DeserializeStopOnRoute(const tc_serialize::StopOnRoutePB& stop);
+    void FillWithReturnRouteStops(const transport::BusRoute* bus_route);
+    void FillWithCircleRouteStops(const transport::BusRoute* bus_route);
+    double CalculateTimeForDistance(int distance) const;
+    static tc_serialize::TwoStopsLinkPB SerializeTwoStopsLink(const TwoStopsLink& link, graph::EdgeId edge) ;
+    static tc_serialize::EdgePB SerializeEdge(const graph::Edge<double>& edge) ;
+    static graph::Edge<double> DeserializeEdge(const tc_serialize::EdgePB& edge) ;
+    static tc_serialize::IncListPB SerializeIncList(const std::vector<size_t>& list) ;
+    static std::vector<size_t> DeserializeIncList(const tc_serialize::IncListPB& list) ;
+};

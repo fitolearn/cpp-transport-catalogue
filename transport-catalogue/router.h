@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include "transport_catalogue.pb.h"
 
 namespace graph {
 
@@ -18,9 +19,12 @@ namespace graph {
     class Router {
     private:
         using Graph = DirectedWeightedGraph<Weight>;
-
     public:
         explicit Router(const Graph& graph);
+        explicit Router(const Graph& graph, const tc_serialize::TransportCatalogue& tc_);
+
+        bool SaveTo(tc_serialize::TransportCatalogue& tc_to) const;
+        bool RestoreFrom(const tc_serialize::TransportCatalogue& tc_from);
 
         struct RouteInfo {
             Weight weight;
@@ -29,12 +33,15 @@ namespace graph {
 
         std::optional<RouteInfo> BuildRoute(VertexId from, VertexId to) const;
 
-    private:
         struct RouteInternalData {
             Weight weight;
             std::optional<EdgeId> prev_edge;
         };
         using RoutesInternalData = std::vector<std::vector<std::optional<RouteInternalData>>>;
+
+    private:
+        tc_serialize::RouteIntDataPB SerializeRouteIntData(const std::optional<Router<Weight>::RouteInternalData> &data) const;
+        std::optional<RouteInternalData> DeserializeRouteIntData(const tc_serialize::RouteIntDataPB& data) const;
 
         void InitializeRoutesInternalData(const Graph& graph) {
             const size_t vertex_count = graph.GetVertexCount();
@@ -74,20 +81,85 @@ namespace graph {
                 }
             }
         }
-
         static constexpr Weight ZERO_WEIGHT{};
         const Graph& graph_;
         RoutesInternalData routes_internal_data_;
     };
 
+    template<typename Weight>
+    std::optional<typename Router<Weight>::RouteInternalData>
+    Router<Weight>::DeserializeRouteIntData(const tc_serialize::RouteIntDataPB &data) const {
+        if (data.data_empty()) {
+            return {std::nullopt};
+        }
+        std::optional<typename Router<Weight>::RouteInternalData> result{Router<Weight>::RouteInternalData {}};
+        if (!data.prev_edge_empty()) {
+            result->prev_edge = data.prev_edge();
+        }
+        result->weight = data.weight();
+        return result;
+    }
+
+    template<typename Weight>
+    tc_serialize::RouteIntDataPB
+    Router<Weight>::SerializeRouteIntData(const std::optional<Router<Weight>::RouteInternalData> &data) const {
+        tc_serialize::RouteIntDataPB result;
+        if (!data) {
+            result.set_data_empty(true);
+            return result;
+        }
+        result.set_data_empty(false);
+        if (data->prev_edge) {
+            result.set_prev_edge_empty(false);
+            result.set_prev_edge(data->prev_edge.value());
+        } else {
+            result.set_prev_edge_empty(true);
+        }
+        result.set_weight(data->weight);
+        return result;
+    }
+
+    template<typename Weight>
+    bool Router<Weight>::RestoreFrom(const tc_serialize::TransportCatalogue &tc_from) {
+        const auto& data_from = tc_from.router_settings().router_routes_int_data();
+        routes_internal_data_.reserve(data_from.routes_list_size());
+        for (int i = 0; i < data_from.routes_list_size(); ++i) {
+            const tc_serialize::VertexCountListPB& small_list = data_from.routes_list(i);
+            std::vector<std::optional<RouteInternalData>> out_list(small_list.vertex_list_size());
+            for (int j = 0; j < small_list.vertex_list_size(); ++j) {
+                const tc_serialize::RouteIntDataPB& data = small_list.vertex_list(j);
+                out_list[j] = DeserializeRouteIntData(data);
+            }
+            routes_internal_data_.emplace_back(std::move(out_list));
+        } return true;
+    }
+
+    template<typename Weight>
+    bool Router<Weight>::SaveTo(tc_serialize::TransportCatalogue &tc_to) const {
+        tc_serialize::RoutesInternalDataListsPB big_list;
+        for (const auto& vertex_list : routes_internal_data_) {
+            tc_serialize::VertexCountListPB int_data_list;
+            for (const auto& data : vertex_list) {
+                *int_data_list.add_vertex_list() = SerializeRouteIntData(data);
+            }
+            *big_list.add_routes_list() = std::move(int_data_list);
+        }
+        *(tc_to.mutable_router_settings()->mutable_router_routes_int_data()) = std::move(big_list);
+        return true;
+    }
+
+    template<typename Weight>
+    Router<Weight>::Router(const Router::Graph &graph, const tc_serialize::TransportCatalogue &tc_pbuf)
+            : graph_(graph) {
+        RestoreFrom(tc_pbuf);
+    }
+
     template <typename Weight>
     Router<Weight>::Router(const Graph& graph)
             : graph_(graph)
-            , routes_internal_data_(graph.GetVertexCount(),
-                                    std::vector<std::optional<RouteInternalData>>(graph.GetVertexCount()))
+            , routes_internal_data_(graph.GetVertexCount(),std::vector<std::optional<RouteInternalData>>(graph.GetVertexCount()))
     {
         InitializeRoutesInternalData(graph);
-
         const size_t vertex_count = graph.GetVertexCount();
         for (VertexId vertex_through = 0; vertex_through < vertex_count; ++vertex_through) {
             RelaxRoutesInternalDataThroughVertex(vertex_count, vertex_through);
@@ -95,23 +167,18 @@ namespace graph {
     }
 
     template <typename Weight>
-    std::optional<typename Router<Weight>::RouteInfo> Router<Weight>::BuildRoute(VertexId from,
-                                                                                 VertexId to) const {
+    std::optional<typename Router<Weight>::RouteInfo> Router<Weight>::BuildRoute(VertexId from, VertexId to) const {
         const auto& route_internal_data = routes_internal_data_.at(from).at(to);
         if (!route_internal_data) {
             return std::nullopt;
         }
         const Weight weight = route_internal_data->weight;
         std::vector<EdgeId> edges;
-        for (std::optional<EdgeId> edge_id = route_internal_data->prev_edge;
-             edge_id;
-             edge_id = routes_internal_data_[from][graph_.GetEdge(*edge_id).from]->prev_edge)
-        {
-            edges.push_back(*edge_id);
+        for (std::optional<EdgeId> edge_id = route_internal_data->prev_edge; edge_id;
+             edge_id = routes_internal_data_[from][graph_.GetEdge(*edge_id).from]->prev_edge){
+            edges.emplace_back(*edge_id);
         }
         std::reverse(edges.begin(), edges.end());
-
         return RouteInfo{weight, std::move(edges)};
     }
-
 }  // namespace graph

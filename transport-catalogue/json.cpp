@@ -1,103 +1,96 @@
 #include "json.h"
+#include <exception>
+#include <algorithm>
 
 using namespace std;
+using namespace std::literals;
 
 namespace json {
 
-    Node::Node(Value value) : variant(std::move(value)) {}
-
     bool Node::IsInt() const {
-        return holds_alternative<int>(*this); // true if the variant currently holds the alternative T, false otherwise.
+        return std::holds_alternative<int>(*this);
     }
+
     bool Node::IsDouble() const {
-        return IsInt() || IsPureDouble();
+        return IsPureDouble() || IsInt();
     }
+
     bool Node::IsPureDouble() const {
-        return holds_alternative<double>(*this);
+        return std::holds_alternative<double>(*this);
     }
+
     bool Node::IsBool() const {
-        return holds_alternative<bool>(*this);
+        return std::holds_alternative<bool>(*this);
     }
+
     bool Node::IsString() const {
-        return holds_alternative<std::string>(*this);
+        return std::holds_alternative<std::string>(*this);
     }
+
     bool Node::IsNull() const {
-        return holds_alternative<std::nullptr_t>(*this);
+        return std::holds_alternative<std::nullptr_t>(*this);
     }
+
     bool Node::IsArray() const {
-        return holds_alternative<Array>(*this);
+        return std::holds_alternative<Array>(*this);
     }
+
     bool Node::IsMap() const {
-        return holds_alternative<Dict>(*this);
+        return std::holds_alternative<Dict>(*this);
     }
 
-    int Node::AsInt() const {
-        if(IsInt()) {
-            return std::get<int>(*this);
-        }
-        throw std::logic_error("Node is not int");
-    }
-    bool Node::AsBool() const {
-        if(IsBool()) {
-            return std::get<bool>(*this);
-        }
-        throw std::logic_error("Node is not bool");
-    }
-    double Node::AsDouble() const {
-        if(IsPureDouble()) {
-            return std::get<double>(*this);
-        }
-        if(IsInt()) {
-            return std::get<int>(*this);
-        }
-        throw std::logic_error("Node is not double");
-    }
-    const std::string& Node::AsString() const {
-        if(IsString()) {
-            return std::get<std::string>(*this);
-        }
-        throw std::logic_error("Node is not string");
-    }
     const Array& Node::AsArray() const {
-        if(IsArray()) {
-            return std::get<Array>(*this);
+        if (! IsArray()) {
+            throw std::logic_error("Node value is not array.");
         }
-        throw std::logic_error("Node is not Array");
-    }
-    const Dict& Node::AsMap() const {
-        if(IsMap()) {
-            return std::get<Dict>(*this);
-        }
-        throw std::logic_error("Node is not map");
-    }
-
-    bool Node::operator==(const Node& other) const {
-        return this->AsString() == other.AsString();
-    }
-
-    bool Node::operator!=(const Node& other) const {
-        return !(*this == other);
-    }
-
-    bool Node::operator==(const std::string& str) const {
-        return this->AsString() == str;
-    }
-
-    Node::Node(): Node{nullptr} {}
-    Node::Node(size_t size) : Node(static_cast<int>(size)) {}
-
-    Dict& Node::AsMap() {
-        using namespace std::literals;
-        if (!IsMap()) {
-            throw std::logic_error("Not a dict"s);
-        } return std::get<Dict>(*this);
+        return std::get<Array>(*this);
     }
 
     Array& Node::AsArray() {
-        using namespace std::literals;
-        if (!IsArray()) {
-            throw std::logic_error("Not an array"s);
-        } return std::get<Array>(*this);
+        if (! IsArray()) {
+            throw std::logic_error("Node value is not array.");
+        }
+        return std::get<Array>(*this);
+    }
+
+    const Dict& Node::AsMap() const {
+        if (!IsMap()) {
+            throw std::logic_error("Node value is not map.");
+        }
+        return std::get<Dict>(*this);
+    }
+
+    int Node::AsInt() const {
+        if (! IsInt()) {
+            throw std::logic_error("Node value is not int.");
+        }
+        return std::get<int>(*this);
+    }
+
+    const string& Node::AsString() const {
+        if (! IsString()) {
+            throw std::logic_error("Node value is not string.");
+        }
+        return std::get<std::string>(*this);
+    }
+
+    bool Node::AsBool() const {
+        if (! IsBool()) {
+            throw std::logic_error("Node value is not bool.");
+        }
+        return std::get<bool>(*this);
+    }
+
+    double Node::AsDouble() const {
+        if (!IsDouble()) {
+            throw std::logic_error("Node value is not double and not int.");
+        }
+        if ( IsInt() ) {
+            int res = std::get<int>(*this);
+            return static_cast<double>(res);
+        } else {
+            return std::get<double>(*this);
+        }
     }
 
     Node LoadNode(istream& input);
@@ -121,7 +114,62 @@ namespace json {
         } return Node(move(result));
     }
 
-    Node LoadDigit(istream& input) {
+    Node LoadString(istream& input) {
+        string line;
+        char c;
+        for(c = input.get(); input && c != '\"'; c = input.get()) {
+            if(c == '\\') {
+                c = input.get();
+                switch(c) {
+                    case 'n': line.push_back('\n'); break;
+                    case 'r': line.push_back('\r'); break;
+                    case 't': line.push_back('\t'); break;
+                    default: line.push_back(c);
+                }
+            } else {
+                line.push_back(c);
+            }
+        }
+        if(c != '\"') {
+            throw ParsingError("String is not closed"s);
+        }
+        return Node(std::move(line));
+    }
+
+    Node LoadDict(istream& input) {
+        Dict result;
+        bool first = true;
+        char c;
+        for (; input >> c && c != '}';) {
+            if(first) {
+                if (c == ',') {
+                    throw ParsingError("Dict error format for first key \" != "s + c);
+                }
+                first = false;
+            } else if (c != ',') {
+                throw ParsingError("Dict error format , != "s + c);
+            } else {
+                input >> c;
+            }
+            if(c != '\"') {
+                throw ParsingError("Dict error format \" != "s + c);
+            }
+            string key = LoadString(input).AsString();
+            if(!(input >> c)) {
+                throw ParsingError("Dict } not found"s);
+            }
+            if(c != ':') {
+                throw ParsingError("Dict error format : != "s + c);
+            }
+            result.insert({std::move(key), LoadNode(input)});
+        }
+        if(c != '}') {
+            throw ParsingError("Dict } not found"s);
+        }
+        return Node(std::move(result));
+    }
+
+    Node LoadNumber(istream& input) {
         std::string digit;
         char temp;
         temp = input.peek();
@@ -182,67 +230,6 @@ namespace json {
         return Node(stod(digit));
     }
 
-    Node LoadString(istream& input) {
-        string line;
-        char c;
-        for(c = input.get(); input && c != '\"'; c = input.get()) {
-            if(c == '\\') {
-                c = input.get();
-                switch(c) {
-                    case 'n': line.push_back('\n'); break;
-                    case 'r': line.push_back('\r'); break;
-                    case 't': line.push_back('\t'); break;
-                    default: line.push_back(c);
-                }
-            } else {
-                line.push_back(c);
-            }
-        }
-        if(c != '\"') {
-            throw ParsingError("String is not closed"s);
-        }
-        return Node(std::move(line));
-    }
-
-    Node LoadDict(istream& input) {
-        Dict result;
-        bool first = true;
-        char c;
-        for (; input >> c && c != '}';) {
-            if(first) {
-                if (c == ',') {
-                    throw ParsingError("Dict error format for first key \" != "s + c);
-                }
-                first = false;
-            } else if (c != ',') {
-                throw ParsingError("Dict error format , != "s + c);
-            } else {
-                input >> c;
-            }
-            if(c != '\"') {
-                throw ParsingError("Dict error format \" != "s + c);
-            }
-            string key = LoadString(input).AsString();
-            if(!(input >> c)) {
-                throw ParsingError("Dict } not found"s);
-            }
-            if(c != ':') {
-                throw ParsingError("Dict error format : != "s + c);
-            }
-            result.insert({std::move(key), LoadNode(input)});
-        }
-        if(c != '}') {
-            throw ParsingError("Dict } not found"s);
-        }
-        return Node(std::move(result));
-    }
-
-    Node LoadNull(istream& input) {
-        if(input.get() == 'u' && input.get() == 'l' && input.get() == 'l') {
-            return Node(nullptr);
-        } throw ParsingError("null invalid"s);
-    }
-
     Node LoadBool(istream& input) {
         std::string line;
         int c = input.get();
@@ -254,10 +241,15 @@ namespace json {
         throw ParsingError("Invalid bool");
     }
 
+    Node LoadNull(istream& input) {
+        if(input.get() == 'u' && input.get() == 'l' && input.get() == 'l') {
+            return Node(nullptr);
+        } throw ParsingError("null invalid"s);
+    }
+
     Node LoadNode(istream& input) {
         char c;
         while(input >> c && (iscntrl(c) || isspace(c)));
-
         if (c == '[') {
             return LoadArray(input);
         } else if (c == '{') {
@@ -271,13 +263,18 @@ namespace json {
             return LoadBool(input);
         } else {
             input.putback(c);
-            return LoadDigit(input);
+            return LoadNumber(input);
         }
     }
 
     Document::Document(Node root)
             : root_(std::move(root)) {
     }
+
+    const Node& Document::GetRoot() const {
+        return root_;
+    }
+
     bool Document::operator==(const Document& other) const {
         return root_ == other.root_;
     }
@@ -286,88 +283,86 @@ namespace json {
         return root_ != other.root_;
     }
 
-    const Node& Document::GetRoot() const {
-        return root_;
-    }
-
     Document Load(istream& input) {
         return Document{LoadNode(input)};
     }
 
-    struct NodePrinter {
-        std::ostream& os;
-        void operator()(int value) {
-            os << value;
-        }
-        void operator()(double value) {
-            os << value;
-        }
-        void operator()(const std::string& str) {
-            os << '\"';
-            for(char c: str) {
-                switch(c) {
-                    case '\n': os << "\\n"; break;
-                    case '\r': os << "\\r"; break;
-                    case '\"': os << "\\\""; break;
-                        //case '\t': os << "\t"; break;
-                    case '\\': os << "\\\\"; break;
-                    default: os << c; break;
-                }
-            } os << '\"';
-        }
-        void operator()(bool b) {
-            os << (b ? "true" : "false");
-        }
-        void operator()(const Array& array) {
-            os << "[";
-            bool second = false;
-            for(auto& node: array) {
-                if(second) {
-                    os << ",";
-                } else {
-                    second = true;
-                }
-                node.Print(os);
-            } os << "]";
-        }
-        void operator()(const Dict& dict) {
-            os << "{ ";
-            bool first = true;
-            for(auto& [key, node]: dict) {
-                if(first) {
-                    first = false;
-                } else {
-                    os << ", ";
-                }
-                Node(key).Print(os);
-                os << ": ";
-                node.Print(os);
+    void PrintValue(std::nullptr_t, svg::RenderContext context) {
+        ostream& out = context.out;
+        out << "null"sv;
+    }
+
+    void PrintValue(const string &str, svg::RenderContext context) {
+        std::ostream& out = context.out;
+        out << "\""sv;
+        for (char c : str) {
+            switch (c) {
+                case '\"':
+                    out << "\\\""sv;
+                    break;
+                case '\r':
+                    out << "\\r"sv;
+                    break;
+                case '\n':
+                    out << "\\n"sv;
+                    break;
+                case '\t':
+                    out << "\t"sv;
+                    break;
+                case '\\':
+                    out << "\\\\"sv;
+                    break;
+                default:
+                    out << c;
             }
-            os << " }";
+        } out << "\""sv;
+    }
+
+    void PrintValue(bool value, svg::RenderContext context) {
+        std::ostream& out = context.out;
+        if (value) {
+            out << "true"sv;
+        } else {
+            out << "false"sv;
         }
-        void operator()(std::nullptr_t) {
-            os << "null";
+    }
+
+    void PrintValue(const Array &arr, svg::RenderContext context) {
+        std::ostream& out = context.out;
+        out << "["sv << endl;
+        auto indent = context.Indented();
+        for (auto iter = arr.begin(); iter != arr.end(); ++iter) {
+            indent.RenderIndent();
+            PrintNode(*iter, indent);
+            if (std::next(iter) != arr.end()) {
+                out << ","sv;
+            }
+            out << endl;
         }
-    };
-    std::ostream& Node::Print(std::ostream& os) const {
-        visit(NodePrinter{os}, *dynamic_cast<const json_variant*>(this));
-        return os;
+        context.RenderIndent();
+        out << "]"sv;
     }
-    std::string Node::Print() const {
-        std::stringstream ret;
-        Print(ret);
-        return ret.str();
+
+    void PrintValue(const Dict &dict, svg::RenderContext context) {
+        std::ostream& out = context.out;
+        auto indent = context.Indented();
+        out << "{"sv << endl;
+        for (auto iter = dict.begin(); iter != dict.end(); ++iter) {
+            indent.RenderIndent();
+            out << "\""sv << iter->first << "\": "sv;
+            PrintNode(iter->second, indent);
+            if (std::next(iter) != dict.end() ) {
+                out << ","sv;
+            }
+            out << endl;
+        }
+        context.RenderIndent();
+        out << "}";
     }
-    void Print(const Document& doc, std::ostream& output) {
-        doc.GetRoot().Print(output);
-    }
-    Document LoadJSON(const std::string& s) {
-        std::istringstream strm(s);
-        return Load(strm);
-    }
-    std::string Print(const Node& node) {
-        std::ostringstream out;
-        Print(Document{ node }, out);
-        return out.str();
+
+    void PrintNode(const Node &node, svg::RenderContext context) {
+        std::visit([&context](const auto& value){
+            PrintValue(value, context);
+        }, node.GetValue());
     }
 }  // namespace json
