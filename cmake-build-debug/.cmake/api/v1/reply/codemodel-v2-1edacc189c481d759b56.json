@@ -9,7 +9,7 @@
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
-						"string" : "3.23"
+						"string" : "3.18.4"
 					},
 					"projectIndex" : 0,
 					"source" : ".",
@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "cpp_transport_catalogue::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-cpp_transport_catalogue-Debug-e9184266c81eb36b1dce.json",
+					"jsonFile" : "target-cpp_transport_catalogue-Debug-ac56acfae1d818ee9389.json",
 					"name" : "cpp_transport_catalogue",
 					"projectIndex" : 0
 				}
